@@ -120,7 +120,7 @@ BoxCollection collection =
 ```java
 BoxFileUploadRequestObject requestObj = 
 	BoxFileUploadRequestObject.uploadFileRequestObject(parent, "name", file);
-List<BoxFile> bFiles = boxClient.getFilesManager().uploadFiles(requestObj);
+BoxFile bFile = boxClient.getFilesManager().uploadFile(requestObj);
 ```
 
 ### Upload a File with a Progress Listener
@@ -129,7 +129,7 @@ List<BoxFile> bFiles = boxClient.getFilesManager().uploadFiles(requestObj);
 BoxFileUploadRequestObject requestObj = 
 	BoxFileUploadRequestObject.uploadFileRequestObject(parent, "name", file)
 		.setListener(listener));
-List<BoxFile> bFiles = boxClient.getFilesManager().uploadFiles(requestObj);
+BoxFile bFile = boxClient.getFilesManager().uploadFile(requestObj);
 ```
 
 ### Download a File
