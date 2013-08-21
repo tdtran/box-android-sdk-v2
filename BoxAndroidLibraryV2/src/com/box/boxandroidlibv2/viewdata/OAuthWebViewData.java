@@ -10,8 +10,9 @@ import com.box.restclientv2.httpclientsupport.HttpClientURIBuilder;
 import com.box.restclientv2.httpclientsupport.HttpClientURLEncodedUtils;
 
 /**
- * Data on the OAuth WebView.
+ * Data on the OAuth WebView. This calss is deprecated, use com.box.boxjavalibv2.authorization.OAuthWebViewData instead.
  */
+@Deprecated
 public class OAuthWebViewData {
 
     public static final String CODE_RESPONSE = "code";

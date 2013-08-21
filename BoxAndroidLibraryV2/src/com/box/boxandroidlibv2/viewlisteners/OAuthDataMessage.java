@@ -6,8 +6,9 @@ import com.box.restclientv2.exceptions.BoxRestException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
- * A message for OAuthData.
+ * A message for OAuthData. This class is deprecated, use com.box.boxjavalibv2.authorization.OAuthDataMessage instead
  */
+@Deprecated
 public class OAuthDataMessage extends StringMessage {
 
     public static final String OAUTH_DATA_MESSAGE_KEY = "oauth_data";
@@ -31,6 +32,6 @@ public class OAuthDataMessage extends StringMessage {
      */
     @Override
     public BoxOAuthToken getData() {
-        return (BoxOAuthToken) Utils.parseJSONStringIntoObject((String) super.getData(), BoxOAuthToken.class);
+        return Utils.parseJSONStringIntoObject((String) super.getData(), BoxOAuthToken.class);
     }
 }
