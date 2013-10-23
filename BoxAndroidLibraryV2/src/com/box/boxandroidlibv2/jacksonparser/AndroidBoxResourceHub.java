@@ -5,6 +5,7 @@ import com.box.boxandroidlibv2.dao.BoxAndroidCollection;
 import com.box.boxandroidlibv2.dao.BoxAndroidComment;
 import com.box.boxandroidlibv2.dao.BoxAndroidEmailAlias;
 import com.box.boxandroidlibv2.dao.BoxAndroidEvent;
+import com.box.boxandroidlibv2.dao.BoxAndroidEventCollection;
 import com.box.boxandroidlibv2.dao.BoxAndroidFile;
 import com.box.boxandroidlibv2.dao.BoxAndroidFileVersion;
 import com.box.boxandroidlibv2.dao.BoxAndroidFolder;
@@ -52,9 +53,10 @@ public class AndroidBoxResourceHub extends BoxResourceHub {
             case EMAIL_ALIASES:
             case WEB_LINKS:
                 return BoxAndroidCollection.class;
+            case EVENTS:
+                return BoxAndroidEventCollection.class;
             default:
                 return super.getClass(type);
         }
     }
-
 }
