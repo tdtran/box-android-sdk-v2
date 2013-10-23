@@ -251,7 +251,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                 protected void onPostExecute(final BoxOAuthToken result) {
                     if (result != null) {
                         try {
-                            fireEvents(OAuthEvent.OAUTH_CREATED, new OAuthDataMessage(result));
+                            fireEvents(OAuthEvent.OAUTH_CREATED, new OAuthDataMessage(result, mBoxClient.getJSONParser()));
                         }
                         catch (BoxRestException e) {
                             fireExceptions(new BoxAndroidLibException(e));

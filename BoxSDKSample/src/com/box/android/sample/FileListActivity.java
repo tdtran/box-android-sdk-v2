@@ -238,7 +238,8 @@ public class FileListActivity extends ListActivity {
                 }
 
                 try {
-                    BoxFileUploadRequestObject upload = BoxFileUploadRequestObject.uploadFileRequestObject("0", "Sample File.txt", sampleFile);
+                    BoxFileUploadRequestObject upload = BoxFileUploadRequestObject.uploadFileRequestObject("0", "Sample File.txt", sampleFile, getClient()
+                        .getJSONParser());
                     getClient().getFilesManager().uploadFile(upload);
                     Log.v(TAG, "Sample file successfully uploaded.");
                 }

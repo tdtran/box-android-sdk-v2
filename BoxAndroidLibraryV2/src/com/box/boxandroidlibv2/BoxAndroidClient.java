@@ -4,12 +4,13 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
-import com.box.boxandroidlibv2.jacksonparser.AndroidBoxResourceHub;
+import com.box.boxandroidlibv2.jsonparsing.AndroidBoxResourceHub;
 import com.box.boxjavalibv2.BoxClient;
 import com.box.boxjavalibv2.authorization.OAuthDataController;
 import com.box.boxjavalibv2.dao.BoxOAuthToken;
 import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
 import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
+import com.box.boxjavalibv2.interfaces.IBoxJSONParser;
 import com.box.boxjavalibv2.interfaces.IBoxResourceHub;
 import com.box.restclientv2.interfaces.IBoxConfig;
 
@@ -22,6 +23,21 @@ import com.box.restclientv2.interfaces.IBoxConfig;
  */
 public class BoxAndroidClient extends BoxClient implements Parcelable {
 
+    /**
+     * @param clientId
+     *            client id
+     * @param clientSecret
+     *            client secret
+     * @param resourcehub
+     *            resource hub, use null for default resource hub.
+     * @param parser
+     *            json parser, use null for default parser.
+     */
+    public BoxAndroidClient(final String clientId, final String clientSecret, final IBoxResourceHub resourcehub, final IBoxJSONParser parser) {
+        super(clientId, clientSecret, resourcehub, parser);
+    }
+
+    @Deprecated
     public BoxAndroidClient(String clientId, String clientSecret) {
         super(clientId, clientSecret);
     }

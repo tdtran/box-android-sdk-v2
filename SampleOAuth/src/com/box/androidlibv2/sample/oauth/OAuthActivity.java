@@ -12,9 +12,9 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.box.boxandroidlibv2.BoxAndroidClient;
-import com.box.boxandroidlibv2.viewlisteners.OAuthDataMessage;
 import com.box.boxandroidlibv2.viewlisteners.OAuthWebViewListener;
 import com.box.boxandroidlibv2.views.OAuthWebView;
+import com.box.boxjavalibv2.authorization.OAuthDataMessage;
 import com.box.boxjavalibv2.events.OAuthEvent;
 import com.box.boxjavalibv2.interfaces.IAuthEvent;
 import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
