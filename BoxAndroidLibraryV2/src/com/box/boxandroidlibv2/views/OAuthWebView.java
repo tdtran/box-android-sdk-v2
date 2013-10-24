@@ -40,7 +40,6 @@ import com.box.boxjavalibv2.interfaces.IAuthFlowListener;
 import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
 import com.box.boxjavalibv2.interfaces.IAuthFlowUI;
 import com.box.boxjavalibv2.requests.requestobjects.BoxOAuthRequestObject;
-import com.box.restclientv2.exceptions.BoxRestException;
 import com.box.restclientv2.httpclientsupport.HttpClientURIBuilder;
 
 /**
@@ -253,7 +252,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                         try {
                             fireEvents(OAuthEvent.OAUTH_CREATED, new OAuthDataMessage(result, mBoxClient.getJSONParser()));
                         }
-                        catch (BoxRestException e) {
+                        catch (Exception e) {
                             fireExceptions(new BoxAndroidLibException(e));
                         }
                     }
