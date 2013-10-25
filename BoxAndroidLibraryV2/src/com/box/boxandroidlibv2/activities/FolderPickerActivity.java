@@ -8,10 +8,10 @@ import android.view.WindowManager.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.box.boxandroidlibv2.BoxAndroidClient;
 import com.box.boxandroidlibv2.R;
 import com.box.boxandroidlibv2.adapters.BoxListItemAdapter;
 import com.box.boxandroidlibv2.dao.BoxAndroidFolder;
+import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.manager.ThumbnailManager;
 import com.box.boxandroidlibv2.viewdata.BoxListItem;
 
@@ -79,16 +79,21 @@ public class FolderPickerActivity extends FilePickerActivity {
      *            current context.
      * @param folderId
      *            folder id to navigate.
-     * @param client
-     *            the client to use for api calls.
+     * @param oauth
+     *            oauth data for client.
+     * @param clientId
+     *            client id
+     * @param clientSecret
+     *            client secret
      * @return an intent to launch an instance of this activity.
      */
-    public static Intent getLaunchIntent(Context context, final String folderId, final BoxAndroidClient client) {
-        Intent intent = FolderNavigationActivity.getLaunchIntent(context, folderId, client);
+    public static Intent getLaunchIntent(Context context, final String folderId, final BoxAndroidOAuthData oauth, final String clientId,
+        final String clientSecret) {
+        Intent intent = FolderNavigationActivity.getLaunchIntent(context, folderId, oauth, clientId, clientSecret);
         intent.setClass(context, FolderPickerActivity.class);
         return intent;
     }
-    
+
     /**
      * Create an intent to launch an instance of this activity to navigate folders. This version will immediately show the given name in the navigation spinner
      * to before information about it has been fetched from the server.
@@ -99,12 +104,18 @@ public class FolderPickerActivity extends FilePickerActivity {
      *            Name to show in the navigation spinner. Should be name of the folder.
      * @param folderId
      *            folder id to navigate.
-     * @param client
-     *            to use for api calls.
+     * @param oauth
+     *            oauth data for client.
+     * @param clientId
+     *            client id
+     * @param clientSecret
+     *            client secret
+     * @return an intent to launch an instance of this activity.
      * @return an intent to launch an instance of this activity.
      */
-    public static Intent getLaunchIntent(Context context, final String folderName, final String folderId, final BoxAndroidClient client) {
-        Intent intent = getLaunchIntent(context, folderId, client);
+    public static Intent getLaunchIntent(Context context, final String folderName, final String folderId, final BoxAndroidOAuthData oauth,
+        final String clientId, final String clientSecret) {
+        Intent intent = getLaunchIntent(context, folderId, oauth, clientId, clientSecret);
         intent.putExtra(EXTRA_FOLDER_NAME, folderName);
         return intent;
     }
@@ -134,7 +145,7 @@ public class FolderPickerActivity extends FilePickerActivity {
         }
 
     }
-    
+
     @Override
     protected String getSourceType() {
         return "folder_chooser";

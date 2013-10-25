@@ -11,10 +11,9 @@ import android.webkit.SslErrorHandler;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.box.boxandroidlibv2.BoxAndroidClient;
-import com.box.boxandroidlibv2.viewlisteners.OAuthDataMessage;
 import com.box.boxandroidlibv2.viewlisteners.OAuthWebViewListener;
 import com.box.boxandroidlibv2.views.OAuthWebView;
+import com.box.boxjavalibv2.authorization.OAuthDataMessage;
 import com.box.boxjavalibv2.events.OAuthEvent;
 import com.box.boxjavalibv2.interfaces.IAuthEvent;
 import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
@@ -45,9 +44,7 @@ public class OAuthActivity extends Activity {
     private void initUI() {
         mainText = (TextView) findViewById(R.id.maintext);
         oauthView = (OAuthWebView) findViewById(R.id.oauthview);
-        BoxAndroidClient boxClient = ((OAuthSampleApplication) getApplication()).getClient();
-        oauthView.initializeAuthFlow(boxClient, this);
-
+        oauthView.initializeAuthFlow(this, OAuthSampleApplication.CLIENT_ID, OAuthSampleApplication.CLIENT_SECRET);
         exitBtn = (Button) findViewById(R.id.exit);
 
         mainText.setText(HINT);

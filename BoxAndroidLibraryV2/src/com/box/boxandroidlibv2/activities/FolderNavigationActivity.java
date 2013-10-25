@@ -19,7 +19,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-
 import android.support.v4.content.LocalBroadcastManager;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
@@ -35,6 +34,7 @@ import com.box.boxandroidlibv2.adapters.BoxListItemAdapter.ViewHolder;
 import com.box.boxandroidlibv2.dao.BoxAndroidCollection;
 import com.box.boxandroidlibv2.dao.BoxAndroidFile;
 import com.box.boxandroidlibv2.dao.BoxAndroidFolder;
+import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.manager.ThumbnailManager;
 import com.box.boxandroidlibv2.viewdata.BoxListItem;
 import com.box.boxjavalibv2.dao.BoxItem;
@@ -60,7 +60,11 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
 
     protected static final String EXTRA_FOLDER_ID = "extraFolderId";
 
-    protected static final String EXTRA_BOX_CLIENT = "extraClient";
+    protected static final String EXTRA_BOX_CLIENT_OAUTH = "extraClient_oauth";
+
+    protected static final String EXTRA_BOX_CLIENT_ID = "extraClientId";
+
+    protected static final String EXTRA_BOX_CLIENT_SECRET = "extraClientSecret";
 
     protected static final String EXTRA_NAV_NUMBER = "nav";
 
@@ -75,6 +79,10 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
     protected String mCurrentFolderId = "0";
 
     protected BoxAndroidClient mClient;
+
+    protected String clientId;
+
+    protected String clientSecret;
 
     /** Because this activity will launch instances of itself this indicates how deep the activity stack is for these internal activities. */
     protected int mNavNumber = 0;
@@ -93,12 +101,21 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
         mListView.setAdapter(initializeBoxListItemAdapter(mThumbnailManager));
         mListView.setOnItemClickListener(this);
         if (getIntent() != null) {
-            mClient = getIntent().getParcelableExtra(EXTRA_BOX_CLIENT);
+            clientId = getIntent().getStringExtra(EXTRA_BOX_CLIENT_ID);
+            clientSecret = getIntent().getStringExtra(EXTRA_BOX_CLIENT_SECRET);
+            BoxAndroidOAuthData authData = getIntent().getParcelableExtra(EXTRA_BOX_CLIENT_OAUTH);
+            mClient = new BoxAndroidClient(clientId, clientSecret, null, null);
+            mClient.authenticate(authData);
             mCurrentFolderId = getIntent().getStringExtra(EXTRA_FOLDER_ID);
             mNavNumber = getIntent().getIntExtra(EXTRA_NAV_NUMBER, 0);
         }
         if (savedInstanceState != null) {
-            mClient = savedInstanceState.getParcelable(EXTRA_BOX_CLIENT);
+
+            clientId = savedInstanceState.getString(EXTRA_BOX_CLIENT_ID);
+            clientSecret = savedInstanceState.getString(EXTRA_BOX_CLIENT_SECRET);
+            BoxAndroidOAuthData authData = savedInstanceState.getParcelable(EXTRA_BOX_CLIENT_OAUTH);
+            mClient = new BoxAndroidClient(clientId, clientSecret, null, null);
+            mClient.authenticate(authData);
             mCurrentFolderId = savedInstanceState.getString(EXTRA_FOLDER_ID);
             mNavNumber = savedInstanceState.getInt(EXTRA_NAV_NUMBER, 0);
         }
@@ -195,7 +212,14 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         outState.putString(EXTRA_FOLDER_ID, mCurrentFolderId);
-        outState.putParcelable(EXTRA_BOX_CLIENT, mClient);
+        outState.putString(EXTRA_BOX_CLIENT_ID, clientId);
+        outState.putString(EXTRA_BOX_CLIENT_SECRET, clientSecret);
+        try {
+            outState.putParcelable(EXTRA_BOX_CLIENT_OAUTH, (BoxAndroidOAuthData) mClient.getAuthData());
+        }
+        catch (AuthFatalFailureException e) {
+            // This shouldn't happen at all.
+        }
         outState.putInt(EXTRA_NAV_NUMBER, mNavNumber);
         super.onSaveInstanceState(outState);
     }
@@ -207,14 +231,21 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
      *            current context.
      * @param folderId
      *            folder id to navigate.
-     * @param client
-     *            the client to use for api calls.
+     * @param oauth
+     *            oauth data for client.
+     * @param clientId
+     *            client id
+     * @param clientSecret
+     *            client secret
      * @return an intent to launch an instance of this activity.
      */
-    public static Intent getLaunchIntent(Context context, final String folderId, final BoxAndroidClient client) {
+    public static Intent getLaunchIntent(Context context, final String folderId, final BoxAndroidOAuthData oauth, final String clientId,
+        final String clientSecret) {
         Intent intent = new Intent(context, FolderNavigationActivity.class);
         intent.putExtra(EXTRA_FOLDER_ID, folderId);
-        intent.putExtra(EXTRA_BOX_CLIENT, client);
+        intent.putExtra(EXTRA_BOX_CLIENT_OAUTH, oauth);
+        intent.putExtra(EXTRA_BOX_CLIENT_ID, clientId);
+        intent.putExtra(EXTRA_BOX_CLIENT_SECRET, clientSecret);
         return intent;
     }
 
@@ -617,9 +648,14 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
      *            The folder clicked on.
      */
     protected void handleFolderClick(BoxAndroidFolder folder) {
-        Intent intent = getLaunchIntent(this, folder.getId(), mClient);
-        intent.setClass(this, getClass());
-        startActivity(intent);
+        try {
+            Intent intent = getLaunchIntent(this, folder.getId(), (BoxAndroidOAuthData) mClient.getAuthData(), clientId, clientSecret);
+            intent.setClass(this, getClass());
+            startActivity(intent);
+        }
+        catch (AuthFatalFailureException e) {
+            // This sohuld not happen.
+        }
 
     }
 

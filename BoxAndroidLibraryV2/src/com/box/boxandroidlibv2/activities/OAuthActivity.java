@@ -9,6 +9,7 @@ import android.webkit.SslErrorHandler;
 
 import com.box.boxandroidlibv2.BoxAndroidClient;
 import com.box.boxandroidlibv2.R;
+import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.viewlisteners.OAuthWebViewListener;
 import com.box.boxandroidlibv2.views.OAuthWebView;
 import com.box.boxjavalibv2.events.OAuthEvent;
@@ -23,7 +24,7 @@ import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
 public class OAuthActivity extends Activity {
 
     public static final String ERROR_MESSAGE = "exception";
-    public static final String BOX_CLIENT = "boxAndroidClient";
+    public static final String BOX_CLIENT_OAUTH = "boxAndroidClient_oauth";
 
     private static final String CLIENT_ID = "clientId";
     private static final String CLIENT_SECRET = "clientSecret";
@@ -49,11 +50,11 @@ public class OAuthActivity extends Activity {
      * @param allowShowRedirect
      */
     private void startOAuth(final String clientId, final String clientSecret, boolean allowShowRedirect) {
-        BoxAndroidClient boxClient = new BoxAndroidClient(clientId, clientSecret);
+        BoxAndroidClient boxClient = new BoxAndroidClient(clientId, clientSecret, null, null);
         oauthView = (OAuthWebView) findViewById(R.id.oauthview);
         oauthView.setAllowShowingRedirectPage(allowShowRedirect);
-        oauthView.initializeAuthFlow(boxClient, this);
-        boxClient.authenticate(oauthView, false, getOAuthFlowListener(boxClient));
+        oauthView.initializeAuthFlow(this, clientId, clientSecret);
+        boxClient.authenticate(oauthView, false, getOAuthFlowListener());
     }
 
     /**
@@ -63,7 +64,7 @@ public class OAuthActivity extends Activity {
      * 
      * @return OAuthWebViewListener
      */
-    private OAuthWebViewListener getOAuthFlowListener(final BoxAndroidClient boxClient) {
+    private OAuthWebViewListener getOAuthFlowListener() {
         return new OAuthWebViewListener() {
 
             @Override
@@ -78,7 +79,7 @@ public class OAuthActivity extends Activity {
             public void onAuthFlowEvent(final IAuthEvent event, final IAuthFlowMessage message) {
                 if (event == OAuthEvent.OAUTH_CREATED) {
                     Intent intent = new Intent();
-                    intent.putExtra(BOX_CLIENT, boxClient);
+                    intent.putExtra(BOX_CLIENT_OAUTH, (BoxAndroidOAuthData) message.getData());
                     OAuthActivity.this.setResult(RESULT_OK, intent);
                     finish();
                 }

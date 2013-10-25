@@ -25,22 +25,24 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.EditText;
 
+import com.box.boxandroidlibv2.BoxAndroidClient;
 import com.box.boxandroidlibv2.R;
+import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.exceptions.BoxAndroidLibException;
 import com.box.boxandroidlibv2.exceptions.UserTerminationException;
+import com.box.boxandroidlibv2.jsonparsing.AndroidBoxResourceHub;
 import com.box.boxandroidlibv2.viewlisteners.OAuthWebViewListener;
 import com.box.boxandroidlibv2.viewlisteners.StringMessage;
 import com.box.boxjavalibv2.BoxClient;
 import com.box.boxjavalibv2.authorization.OAuthDataMessage;
 import com.box.boxjavalibv2.authorization.OAuthWebViewData;
-import com.box.boxjavalibv2.dao.BoxOAuthToken;
 import com.box.boxjavalibv2.events.OAuthEvent;
 import com.box.boxjavalibv2.interfaces.IAuthEvent;
 import com.box.boxjavalibv2.interfaces.IAuthFlowListener;
 import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
 import com.box.boxjavalibv2.interfaces.IAuthFlowUI;
+import com.box.boxjavalibv2.jsonparsing.BoxJSONParser;
 import com.box.boxjavalibv2.requests.requestobjects.BoxOAuthRequestObject;
-import com.box.restclientv2.exceptions.BoxRestException;
 import com.box.restclientv2.httpclientsupport.HttpClientURIBuilder;
 
 /**
@@ -78,7 +80,9 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
-    public void initializeAuthFlow(final BoxClient boxClient, final Object activity) {
+    public void initializeAuthFlow(final Object activity, final String clientId, final String clientSecret) {
+        AndroidBoxResourceHub hub = new AndroidBoxResourceHub();
+        BoxAndroidClient boxClient = new BoxAndroidClient(clientId, clientSecret, hub, new BoxJSONParser(hub));
         this.mWebViewData = new OAuthWebViewData(boxClient.getOAuthDataController());
         mWebClient = new OAuthWebViewClient(mWebViewData, (Activity) activity, boxClient);
         mWebClient.setAllowShowRedirectPage(allowShowRedirectPage());
@@ -231,13 +235,13 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
          *            code
          */
         private void startCreateOAuth(final String code) {
-            AsyncTask<Null, Null, BoxOAuthToken> task = new AsyncTask<Null, Null, BoxOAuthToken>() {
+            AsyncTask<Null, Null, BoxAndroidOAuthData> task = new AsyncTask<Null, Null, BoxAndroidOAuthData>() {
 
                 @Override
-                protected BoxOAuthToken doInBackground(final Null... params) {
-                    BoxOAuthToken oauth = null;
+                protected BoxAndroidOAuthData doInBackground(final Null... params) {
+                    BoxAndroidOAuthData oauth = null;
                     try {
-                        oauth = mBoxClient.getOAuthManager().createOAuth(
+                        oauth = (BoxAndroidOAuthData) mBoxClient.getOAuthManager().createOAuth(
                             BoxOAuthRequestObject.createOAuthRequestObject(code, mwebViewData.getClientId(), mwebViewData.getClientSecret(),
                                 mwebViewData.getRedirectUrl()));
                     }
@@ -248,12 +252,12 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                 }
 
                 @Override
-                protected void onPostExecute(final BoxOAuthToken result) {
+                protected void onPostExecute(final BoxAndroidOAuthData result) {
                     if (result != null) {
                         try {
-                            fireEvents(OAuthEvent.OAUTH_CREATED, new OAuthDataMessage(result));
+                            fireEvents(OAuthEvent.OAUTH_CREATED, new OAuthDataMessage(result, mBoxClient.getJSONParser(), mBoxClient.getResourceHub()));
                         }
-                        catch (BoxRestException e) {
+                        catch (Exception e) {
                             fireExceptions(new BoxAndroidLibException(e));
                         }
                     }

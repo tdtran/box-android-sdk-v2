@@ -1,4 +1,4 @@
-package com.box.boxandroidlibv2.jacksonparser;
+package com.box.boxandroidlibv2.jsonparsing;
 
 import com.box.boxandroidlibv2.dao.BoxAndroidCollaboration;
 import com.box.boxandroidlibv2.dao.BoxAndroidCollection;
@@ -13,7 +13,7 @@ import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.dao.BoxAndroidUser;
 import com.box.boxandroidlibv2.dao.BoxAndroidWebLink;
 import com.box.boxjavalibv2.dao.BoxResourceType;
-import com.box.boxjavalibv2.jacksonparser.BoxResourceHub;
+import com.box.boxjavalibv2.jsonparsing.BoxResourceHub;
 
 /**
  * Resource hub to direct the parsing of the api responses into our android sdk data objects.

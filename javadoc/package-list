@@ -3,7 +3,7 @@ com.box.boxandroidlibv2.activities
 com.box.boxandroidlibv2.adapters
 com.box.boxandroidlibv2.dao
 com.box.boxandroidlibv2.exceptions
-com.box.boxandroidlibv2.jacksonparser
+com.box.boxandroidlibv2.jsonparsing
 com.box.boxandroidlibv2.manager
 com.box.boxandroidlibv2.viewdata
 com.box.boxandroidlibv2.viewlisteners
@@ -16,8 +16,8 @@ com.box.boxjavalibv2.exceptions
 com.box.boxjavalibv2.filetransfer
 com.box.boxjavalibv2.httpentities
 com.box.boxjavalibv2.interfaces
-com.box.boxjavalibv2.jacksonparser
 com.box.boxjavalibv2.jsonentities
+com.box.boxjavalibv2.jsonparsing
 com.box.boxjavalibv2.requests
 com.box.boxjavalibv2.requests.requestobjects
 com.box.boxjavalibv2.resourcemanagers

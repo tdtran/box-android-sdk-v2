@@ -171,9 +171,10 @@ public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// Implement your own logic to handle the error.
 	   handleFail(failMessage);
 	} else {
-		// You will get an authenticated BoxClient object back upon success.
-		BoxClient client =
-			data.getParcelableExtra(OAuthActivity.BOX_CLIENT);
+		// You will get an authenticated oath token object back upon success.
+		BoxAndroidOAuthData oauth = data.getParcelableExtra(OAuthActivity.BOX_CLIENT_OAUTH);
+                BoxAndroidClient client = new BoxAndroidClient(clientId, clientSecret, null, null);
+                client.authenticate(oauth);
 		youOwnMethod(client);
 	}
 }
@@ -186,7 +187,7 @@ authentication.
 
 ```java
 oauthView = (OAuthWebView) findViewById(R.id.oauthview);
-oauthView.initializeAuthFlow(boxClient, this);
+oauthView.initializeAuthFlow(this, clientId, clientSecret);
 boxClient.authenticate(oauthView, autoRefreshOAuth, getOAuthFlowListener());
 
 // Create a listener listening to OAuth flow. The most important part you need

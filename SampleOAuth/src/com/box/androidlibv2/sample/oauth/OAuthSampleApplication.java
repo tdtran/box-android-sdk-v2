@@ -7,15 +7,13 @@ import com.box.boxandroidlibv2.BoxAndroidClient;
 public class OAuthSampleApplication extends Application {
 
     // TODO: use your own client settings
-    private static final String CLIENT_ID = "";
-    private static final String CLIENT_SECRET = "";
+    public static final String CLIENT_ID = "";
+    public static final String CLIENT_SECRET = "";
 
-    private BoxAndroidClient client;
+    private final BoxAndroidClient client = new BoxAndroidClient(CLIENT_ID, CLIENT_SECRET, null, null);
 
     public BoxAndroidClient getClient() {
-        if (client == null) {
-            client = new BoxAndroidClient(CLIENT_ID, CLIENT_SECRET);
-        }
         return client;
     }
+
 }
