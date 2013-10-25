@@ -25,10 +25,12 @@ import com.box.boxandroidlibv2.dao.BoxAndroidCollection;
 import com.box.boxandroidlibv2.dao.BoxAndroidFile;
 import com.box.boxandroidlibv2.dao.BoxAndroidFolder;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
+import com.box.boxjavalibv2.authorization.OAuthRefreshListener;
 import com.box.boxjavalibv2.dao.BoxCollection;
 import com.box.boxjavalibv2.dao.BoxFolder;
 import com.box.boxjavalibv2.dao.BoxTypedObject;
 import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
+import com.box.boxjavalibv2.interfaces.IAuthData;
 import com.box.boxjavalibv2.requests.requestobjects.BoxFileUploadRequestObject;
 import com.box.restclientv2.exceptions.BoxSDKException;
 
@@ -102,6 +104,17 @@ public class FileListActivity extends ListActivity {
                     BoxAndroidClient client = new BoxAndroidClient(BoxSDKSampleApplication.CLIENT_ID, BoxSDKSampleApplication.CLIENT_SECRET, null, null);
                     client.authenticate(oauth);
                     BoxSDKSampleApplication app = (BoxSDKSampleApplication) getApplication();
+                    client.addOAuthRefreshListener(new OAuthRefreshListener() {
+
+                        @Override
+                        public void onRefresh(IAuthData newAuthData) {
+                            // This is when oauth gets refreshed, once the token gets refreshed, both the old access token and refresh token will be
+                            // invalidated.
+                            // you should update the new auth tokens to your secure storage for future use.
+                            Log.d("OAuth", "oauth refreshed, new oauth access token is:" + newAuthData.getAccessToken());
+                        }
+
+                    });
                     app.setClient(client);
                 }
 
