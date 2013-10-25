@@ -14,13 +14,14 @@ import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.box.boxandroidlibv2.BoxAndroidClient;
 import com.box.boxandroidlibv2.R;
 import com.box.boxandroidlibv2.adapters.NavigationListAdapter;
 import com.box.boxandroidlibv2.dao.BoxAndroidFile;
 import com.box.boxandroidlibv2.dao.BoxAndroidFolder;
+import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.viewdata.NavigationItem;
 import com.box.boxjavalibv2.dao.BoxItem;
+import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
 
 /**
  * This class is used to choose a particular file from the user's account and when chosen will return a result with a BoxAndroidFile in the extra
@@ -94,11 +95,17 @@ public class FilePickerActivity extends FolderNavigationActivity {
         if (folderId == null || mCurrentFolder != null && mCurrentFolder.getId().equals(folderId)) {
             return;
         }
-        Intent intent = getLaunchIntent(this, folderId, mClient);
-        intent.setClass(this, getClass());
-        intent.putExtra(EXTRA_NAV_NUMBER, (mNavNumber + 1));
+        try {
+            Intent intent = getLaunchIntent(this, folderId, (BoxAndroidOAuthData) mClient.getAuthData(), clientId, clientSecret);
 
-        startActivityForResult(intent, FILE_PICKER_REQUEST_CODE);
+            intent.setClass(this, getClass());
+            intent.putExtra(EXTRA_NAV_NUMBER, (mNavNumber + 1));
+
+            startActivityForResult(intent, FILE_PICKER_REQUEST_CODE);
+        }
+        catch (AuthFatalFailureException e) {
+            // This shouldn't happen.
+        }
     }
 
     /**
@@ -113,11 +120,17 @@ public class FilePickerActivity extends FolderNavigationActivity {
         if (folderId == null || mCurrentFolder != null && mCurrentFolder.getId().equals(folderId)) {
             return;
         }
-        Intent intent = getLaunchIntent(this, folderName, folderId, mClient);
-        intent.setClass(this, getClass());
-        intent.putExtra(EXTRA_NAV_NUMBER, (mNavNumber + 1));
 
-        startActivityForResult(intent, FILE_PICKER_REQUEST_CODE);
+        try {
+            Intent intent = getLaunchIntent(this, folderName, folderId, (BoxAndroidOAuthData) mClient.getAuthData(), clientId, clientSecret);
+            intent.setClass(this, getClass());
+            intent.putExtra(EXTRA_NAV_NUMBER, (mNavNumber + 1));
+
+            startActivityForResult(intent, FILE_PICKER_REQUEST_CODE);
+        }
+        catch (AuthFatalFailureException e) {
+            // This shouldn't happen.
+        }
     }
 
     @Override
@@ -174,12 +187,17 @@ public class FilePickerActivity extends FolderNavigationActivity {
      *            current context.
      * @param folderId
      *            folder id to navigate.
-     * @param client
-     *            the client to use for api calls.
+     * @param oauth
+     *            oauth data for client.
+     * @param clientId
+     *            client id
+     * @param clientSecret
+     *            client secret
      * @return an intent to launch an instance of this activity.
      */
-    public static Intent getLaunchIntent(Context context, final String folderId, final BoxAndroidClient client) {
-        Intent intent = FolderNavigationActivity.getLaunchIntent(context, folderId, client);
+    public static Intent getLaunchIntent(Context context, final String folderId, final BoxAndroidOAuthData oauth, final String clientId,
+        final String clientSecret) {
+        Intent intent = FolderNavigationActivity.getLaunchIntent(context, folderId, oauth, clientId, clientSecret);
         intent.setClass(context, FilePickerActivity.class);
         return intent;
     }
@@ -194,12 +212,17 @@ public class FilePickerActivity extends FolderNavigationActivity {
      *            Name to show in the navigation spinner. Should be name of the folder.
      * @param folderId
      *            folder id to navigate.
-     * @param client
-     *            to use for api calls.
+     * @param oauth
+     *            oauth data for client.
+     * @param clientId
+     *            client id
+     * @param clientSecret
+     *            client secret
      * @return an intent to launch an instance of this activity.
      */
-    public static Intent getLaunchIntent(Context context, final String folderName, final String folderId, final BoxAndroidClient client) {
-        Intent intent = getLaunchIntent(context, folderId, client);
+    public static Intent getLaunchIntent(Context context, final String folderName, final String folderId, final BoxAndroidOAuthData oauth,
+        final String clientId, final String clientSecret) {
+        Intent intent = getLaunchIntent(context, folderId, oauth, clientId, clientSecret);
         intent.putExtra(EXTRA_FOLDER_NAME, folderName);
         return intent;
     }
@@ -257,7 +280,7 @@ public class FilePickerActivity extends FolderNavigationActivity {
         });
 
     }
-    
+
     @Override
     protected String getSourceType() {
         return "file_picker";

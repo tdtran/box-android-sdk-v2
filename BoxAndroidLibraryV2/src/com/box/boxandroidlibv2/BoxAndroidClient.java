@@ -1,14 +1,9 @@
 package com.box.boxandroidlibv2;
 
-import android.os.Parcel;
-import android.os.Parcelable;
-
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.jsonparsing.AndroidBoxResourceHub;
 import com.box.boxjavalibv2.BoxClient;
-import com.box.boxjavalibv2.authorization.OAuthDataController;
 import com.box.boxjavalibv2.dao.BoxOAuthToken;
-import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
 import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
 import com.box.boxjavalibv2.interfaces.IBoxJSONParser;
 import com.box.boxjavalibv2.interfaces.IBoxResourceHub;
@@ -21,7 +16,7 @@ import com.box.restclientv2.interfaces.IBoxConfig;
  * valid API key to use the Box API. All methods in this class are executed in the invoking thread, and therefore are NOT safe to execute in the UI thread of
  * your application. You should only use this class if you already have worker threads or AsyncTasks that you want to incorporate the Box API into.
  */
-public class BoxAndroidClient extends BoxClient implements Parcelable {
+public class BoxAndroidClient extends BoxClient {
 
     /**
      * @param clientId
@@ -42,12 +37,6 @@ public class BoxAndroidClient extends BoxClient implements Parcelable {
         super(clientId, clientSecret);
     }
 
-    private BoxAndroidClient(final Parcel in) {
-        this(in.readString(), in.readString());
-        BoxAndroidOAuthData oauthData = BoxAndroidOAuthData.CREATOR.createFromParcel(in);
-        getOAuthDataController().setOAuthData(oauthData);
-    }
-
     @Override
     protected IBoxResourceHub createResourceHub() {
         return new AndroidBoxResourceHub();
@@ -62,34 +51,4 @@ public class BoxAndroidClient extends BoxClient implements Parcelable {
     protected BoxOAuthToken getOAuthTokenFromMessage(IAuthFlowMessage message) {
         return new BoxAndroidOAuthData(super.getOAuthTokenFromMessage(message));
     }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        OAuthDataController oauthController = getOAuthDataController();
-        dest.writeString(oauthController.getClientId());
-        dest.writeString(oauthController.getClientSecret());
-        try {
-            (new BoxAndroidOAuthData(oauthController.getAuthData())).writeToParcel(dest, flags);
-        }
-        catch (AuthFatalFailureException e) {
-        }
-    }
-
-    public static final Parcelable.Creator<BoxAndroidClient> CREATOR = new Parcelable.Creator<BoxAndroidClient>() {
-
-        @Override
-        public BoxAndroidClient createFromParcel(Parcel source) {
-            return new BoxAndroidClient(source);
-        }
-
-        @Override
-        public BoxAndroidClient[] newArray(int size) {
-            return new BoxAndroidClient[size];
-        }
-    };
 }
