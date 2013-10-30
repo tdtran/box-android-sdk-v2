@@ -137,6 +137,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         private BoxClient mBoxClient;
         private final OAuthWebViewData mwebViewData;
         private boolean allowShowRedirectPage = true;
+        private boolean startedCreateOAuth = false;
 
         private final List<IAuthFlowListener> mListeners = new ArrayList<IAuthFlowListener>();
         private Activity mActivity;
@@ -162,6 +163,10 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
             this.mListeners.add(listener);
         }
 
+        void setStartedCreateOAuth(boolean started) {
+            startedCreateOAuth = started;
+        }
+
         @Override
         public void onPageStarted(final WebView view, final String url, final Bitmap favicon) {
             for (IAuthFlowListener listener : mListeners) {
@@ -169,10 +174,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                     listener.onAuthFlowEvent(OAuthEvent.PAGE_STARTED, new StringMessage(StringMessage.MESSAGE_URL, url));
                 }
             }
-        }
 
-        @Override
-        public boolean shouldOverrideUrlLoading(WebView view, String url) {
             String code = null;
             try {
                 code = getResponseValueFromUrl(url);
@@ -186,10 +188,15 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                         listener.onAuthFlowMessage(new StringMessage(mwebViewData.getResponseType(), code));
                     }
                 }
+                setStartedCreateOAuth(true);
                 startCreateOAuth(code);
-                if (!allowShowRedirectPage()) {
-                    return true;
-                }
+            }
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String url) {
+            if (startedCreateOAuth && !allowShowRedirectPage()) {
+                return true;
             }
             return false;
         }
@@ -255,6 +262,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                 protected void onPostExecute(final BoxAndroidOAuthData result) {
                     if (result != null) {
                         try {
+                            setStartedCreateOAuth(false);
                             fireEvents(OAuthEvent.OAUTH_CREATED, new OAuthDataMessage(result, mBoxClient.getJSONParser(), mBoxClient.getResourceHub()));
                         }
                         catch (Exception e) {

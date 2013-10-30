@@ -297,7 +297,7 @@ public class FileListActivity extends ListActivity {
      * Start OAuth flow.
      */
     private void startAuth() {
-        Intent intent = OAuthActivity.createOAuthActivityIntent(this, BoxSDKSampleApplication.CLIENT_ID, BoxSDKSampleApplication.CLIENT_SECRET);
+        Intent intent = OAuthActivity.createOAuthActivityIntent(this, BoxSDKSampleApplication.CLIENT_ID, BoxSDKSampleApplication.CLIENT_SECRET, false);
         startActivityForResult(intent, AUTHENTICATE_REQUEST);
     }
 
