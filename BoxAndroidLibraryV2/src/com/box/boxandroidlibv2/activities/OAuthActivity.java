@@ -1,5 +1,7 @@
 package com.box.boxandroidlibv2.activities;
 
+import org.apache.commons.lang.StringUtils;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -25,10 +27,13 @@ public class OAuthActivity extends Activity {
 
     public static final String ERROR_MESSAGE = "exception";
     public static final String BOX_CLIENT_OAUTH = "boxAndroidClient_oauth";
+    public static final String BOX_DEVICE_ID = "boxdeviceid";
+    public static final String BOX_DEVICE_NAME = "boxdevicename";
 
     private static final String CLIENT_ID = "clientId";
     private static final String CLIENT_SECRET = "clientSecret";
     private static final String ALLOW_LOAD_REDIRECT_PAGE = "allowloadredirectpage";
+
     private OAuthWebView oauthView;
 
     @Override
@@ -36,10 +41,13 @@ public class OAuthActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.boxandroidlibv2_activity_oauth);
 
-        String clientId = getIntent().getStringExtra(CLIENT_ID);
-        String clientSecret = getIntent().getStringExtra(CLIENT_SECRET);
+        Intent intent = getIntent();
+        String clientId = intent.getStringExtra(CLIENT_ID);
+        String clientSecret = intent.getStringExtra(CLIENT_SECRET);
+        String deviceId = intent.getStringExtra(BOX_DEVICE_ID);
+        String deviceName = intent.getStringExtra(BOX_DEVICE_NAME);
         boolean allowShowRedirect = getIntent().getBooleanExtra(ALLOW_LOAD_REDIRECT_PAGE, true);
-        startOAuth(clientId, clientSecret, allowShowRedirect);
+        startOAuth(clientId, clientSecret, allowShowRedirect, deviceId, deviceName);
     }
 
     /**
@@ -48,12 +56,18 @@ public class OAuthActivity extends Activity {
      * @param clientId
      * @param clientSecret
      * @param allowShowRedirect
+     * @param deviceName
+     * @param deviceId
      */
-    private void startOAuth(final String clientId, final String clientSecret, boolean allowShowRedirect) {
+    protected void startOAuth(final String clientId, final String clientSecret, boolean allowShowRedirect, String deviceId, String deviceName) {
         BoxAndroidClient boxClient = new BoxAndroidClient(clientId, clientSecret, null, null);
         oauthView = (OAuthWebView) findViewById(R.id.oauthview);
         oauthView.setAllowShowingRedirectPage(allowShowRedirect);
         oauthView.initializeAuthFlow(this, clientId, clientSecret);
+        if (StringUtils.isNotEmpty(deviceId) && StringUtils.isNotEmpty(deviceName)) {
+            oauthView.setDevice(deviceId, deviceName);
+        }
+
         boxClient.authenticate(oauthView, false, getOAuthFlowListener());
     }
 
