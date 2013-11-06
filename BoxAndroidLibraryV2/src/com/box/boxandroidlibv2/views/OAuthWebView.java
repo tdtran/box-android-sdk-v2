@@ -56,6 +56,10 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
     private OAuthWebViewClient mWebClient;
 
+    private String deviceId;
+
+    private String deviceName;
+
     /**
      * Constructor.
      * 
@@ -88,6 +92,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         mWebClient.setAllowShowRedirectPage(allowShowRedirectPage());
         getSettings().setJavaScriptEnabled(true);
         setWebViewClient(mWebClient);
+        setDevice(deviceId, deviceName);
     }
 
     @Override
@@ -101,6 +106,14 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
             if (listener != null) {
                 listener.onAuthFlowException(e);
             }
+        }
+    }
+
+    public void setDevice(final String id, final String name) {
+        deviceId = id;
+        deviceName = name;
+        if (mWebClient != null) {
+            mWebClient.setDevice(id, name);
         }
     }
 
@@ -139,6 +152,10 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         private boolean allowShowRedirectPage = true;
         private boolean startedCreateOAuth = false;
 
+        private String deviceId;
+
+        private String deviceName;
+
         private final List<IAuthFlowListener> mListeners = new ArrayList<IAuthFlowListener>();
         private Activity mActivity;
 
@@ -157,6 +174,11 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
             this.mwebViewData = webViewData;
             this.mActivity = activity;
             this.mBoxClient = boxClient;
+        }
+
+        public void setDevice(final String id, final String name) {
+            deviceId = id;
+            deviceName = name;
         }
 
         public void addListener(final IAuthFlowListener listener) {
@@ -248,9 +270,13 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                 protected BoxAndroidOAuthData doInBackground(final Null... params) {
                     BoxAndroidOAuthData oauth = null;
                     try {
-                        oauth = (BoxAndroidOAuthData) mBoxClient.getOAuthManager().createOAuth(
-                            BoxOAuthRequestObject.createOAuthRequestObject(code, mwebViewData.getClientId(), mwebViewData.getClientSecret(),
-                                mwebViewData.getRedirectUrl()));
+                        BoxOAuthRequestObject requestObj = BoxOAuthRequestObject.createOAuthRequestObject(code, mwebViewData.getClientId(),
+                            mwebViewData.getClientSecret(), mwebViewData.getRedirectUrl());
+                        if (StringUtils.isNotEmpty(deviceId) && StringUtils.isNotEmpty(deviceName)) {
+                            requestObj.put("device_id", deviceId);
+                            requestObj.put("device_name", deviceName);
+                        }
+                        oauth = (BoxAndroidOAuthData) mBoxClient.getOAuthManager().createOAuth(requestObj);
                     }
                     catch (Exception e) {
                         oauth = null;
