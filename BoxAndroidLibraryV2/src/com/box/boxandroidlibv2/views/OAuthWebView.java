@@ -88,8 +88,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         AndroidBoxResourceHub hub = new AndroidBoxResourceHub();
         BoxAndroidClient boxClient = new BoxAndroidClient(clientId, clientSecret, hub, new BoxJSONParser(hub));
         this.mWebViewData = new OAuthWebViewData(boxClient.getOAuthDataController());
-        mWebClient = new OAuthWebViewClient(mWebViewData, (Activity) activity, boxClient);
-        mWebClient.setAllowShowRedirectPage(allowShowRedirectPage());
+        mWebClient = createOAuthWebViewClient(mWebViewData, activity, boxClient);
         getSettings().setJavaScriptEnabled(true);
         setWebViewClient(mWebClient);
         setDevice(deviceId, deviceName);
@@ -124,7 +123,9 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
     @Override
     public void destroy() {
         super.destroy();
-        mWebClient.destroy();
+        if (mWebClient != null) {
+            mWebClient.destroy();
+        }
     }
 
     /**
@@ -142,10 +143,16 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         this.allowShowingRedirectPage = allowShowingRedirectPage;
     }
 
+    protected OAuthWebViewClient createOAuthWebViewClient(OAuthWebViewData data, Object activity, BoxClient boxClient) {
+        OAuthWebViewClient c = new OAuthWebViewClient(data, (Activity) activity, boxClient);
+        c.setAllowShowRedirectPage(allowShowRedirectPage());
+        return c;
+    }
+
     /**
      * WebViewClient for the OAuth WebView.
      */
-    private static class OAuthWebViewClient extends WebViewClient {
+    public static class OAuthWebViewClient extends WebViewClient {
 
         private BoxClient mBoxClient;
         private final OAuthWebViewData mwebViewData;

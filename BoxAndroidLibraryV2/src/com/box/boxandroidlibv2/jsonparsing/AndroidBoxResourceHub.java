@@ -57,7 +57,7 @@ public class AndroidBoxResourceHub extends BoxResourceHub {
             case EVENTS:
                 return BoxAndroidEventCollection.class;
             default:
-                return super.getClass(type);
+                return super.getObjectClassGivenConcreteIBoxType(type);
         }
     }
 }
