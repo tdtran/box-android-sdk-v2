@@ -13,6 +13,7 @@ import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.dao.BoxAndroidUser;
 import com.box.boxandroidlibv2.dao.BoxAndroidWebLink;
 import com.box.boxjavalibv2.dao.BoxResourceType;
+import com.box.boxjavalibv2.interfaces.IBoxType;
 import com.box.boxjavalibv2.jsonparsing.BoxResourceHub;
 
 /**
@@ -22,8 +23,8 @@ public class AndroidBoxResourceHub extends BoxResourceHub {
 
     @SuppressWarnings("rawtypes")
     @Override
-    public Class getClass(BoxResourceType type) {
-        switch (type) {
+    protected Class getObjectClassGivenConcreteIBoxType(IBoxType type) {
+        switch ((BoxResourceType) type) {
             case FILE:
                 return BoxAndroidFile.class;
             case FOLDER:
