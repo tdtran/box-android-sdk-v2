@@ -30,16 +30,16 @@ public class OAuthActivity extends Activity {
     public static final String BOX_DEVICE_ID = "boxdeviceid";
     public static final String BOX_DEVICE_NAME = "boxdevicename";
 
-    private static final String CLIENT_ID = "clientId";
-    private static final String CLIENT_SECRET = "clientSecret";
-    private static final String ALLOW_LOAD_REDIRECT_PAGE = "allowloadredirectpage";
+    protected static final String CLIENT_ID = "clientId";
+    protected static final String CLIENT_SECRET = "clientSecret";
+    protected static final String ALLOW_LOAD_REDIRECT_PAGE = "allowloadredirectpage";
 
     private OAuthWebView oauthView;
 
     @Override
     public void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.boxandroidlibv2_activity_oauth);
+        setContentView(getContentView());
 
         Intent intent = getIntent();
         String clientId = intent.getStringExtra(CLIENT_ID);
@@ -48,6 +48,10 @@ public class OAuthActivity extends Activity {
         String deviceName = intent.getStringExtra(BOX_DEVICE_NAME);
         boolean allowShowRedirect = getIntent().getBooleanExtra(ALLOW_LOAD_REDIRECT_PAGE, true);
         startOAuth(clientId, clientSecret, allowShowRedirect, deviceId, deviceName);
+    }
+
+    protected int getContentView() {
+        return R.layout.boxandroidlibv2_activity_oauth;
     }
 
     /**
