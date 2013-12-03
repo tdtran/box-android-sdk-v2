@@ -54,6 +54,8 @@ project, add the following to your list of dependencies:
 You can refer to the Android Gradle guide on multi project setups [here
 ][android-gradle].
 
+Here is a more detailed [tutorial][tutorial-box-gradle] on setting up box sdk using gradle.
+
 API Calls Quickstart
 --------------------
 
@@ -216,3 +218,4 @@ boxClient.authenticate(oauthObject);
 
 [java-sdk]: https://github.com/box/box-java-sdk-private
 [android-gradle]: http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Multi-project-setup
+[tutorial-box-gradle]:  http://rexstjohn.com/using-android-box-sdk-android-studio
