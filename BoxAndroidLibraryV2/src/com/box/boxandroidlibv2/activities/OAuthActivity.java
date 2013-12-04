@@ -32,6 +32,7 @@ public class OAuthActivity extends Activity {
 
     protected static final String CLIENT_ID = "clientId";
     protected static final String CLIENT_SECRET = "clientSecret";
+    protected static final String REDIRECT_URL = "redirecturl";
     protected static final String ALLOW_LOAD_REDIRECT_PAGE = "allowloadredirectpage";
 
     private OAuthWebView oauthView;
@@ -46,8 +47,9 @@ public class OAuthActivity extends Activity {
         String clientSecret = intent.getStringExtra(CLIENT_SECRET);
         String deviceId = intent.getStringExtra(BOX_DEVICE_ID);
         String deviceName = intent.getStringExtra(BOX_DEVICE_NAME);
+        String redirectUrl = intent.getStringExtra(REDIRECT_URL);
         boolean allowShowRedirect = getIntent().getBooleanExtra(ALLOW_LOAD_REDIRECT_PAGE, true);
-        startOAuth(clientId, clientSecret, allowShowRedirect, deviceId, deviceName);
+        startOAuth(clientId, clientSecret, redirectUrl, allowShowRedirect, deviceId, deviceName);
     }
 
     protected int getContentView() {
@@ -59,15 +61,17 @@ public class OAuthActivity extends Activity {
      * 
      * @param clientId
      * @param clientSecret
+     * @param redirectUrl
      * @param allowShowRedirect
      * @param deviceName
      * @param deviceId
      */
-    protected void startOAuth(final String clientId, final String clientSecret, boolean allowShowRedirect, String deviceId, String deviceName) {
+    protected void startOAuth(final String clientId, final String clientSecret, String redirectUrl, boolean allowShowRedirect, String deviceId,
+        String deviceName) {
         BoxAndroidClient boxClient = new BoxAndroidClient(clientId, clientSecret, null, null);
         oauthView = (OAuthWebView) findViewById(R.id.oauthview);
         oauthView.setAllowShowingRedirectPage(allowShowRedirect);
-        oauthView.initializeAuthFlow(this, clientId, clientSecret);
+        oauthView.initializeAuthFlow(this, clientId, clientSecret, redirectUrl);
         if (StringUtils.isNotEmpty(deviceId) && StringUtils.isNotEmpty(deviceName)) {
             oauthView.setDevice(deviceId, deviceName);
         }
@@ -155,10 +159,18 @@ public class OAuthActivity extends Activity {
      * @return
      */
     public static Intent createOAuthActivityIntent(final Context context, final String clientId, final String clientSecret, final boolean allowShowRedirectPage) {
+        return createOAuthActivityIntent(context, clientId, clientSecret, allowShowRedirectPage, null);
+    }
+
+    public static Intent createOAuthActivityIntent(final Context context, final String clientId, final String clientSecret,
+        final boolean allowShowRedirectPage, String redirectUrl) {
         Intent intent = new Intent(context, OAuthActivity.class);
         intent.putExtra(CLIENT_ID, clientId);
         intent.putExtra(CLIENT_SECRET, clientSecret);
         intent.putExtra(ALLOW_LOAD_REDIRECT_PAGE, allowShowRedirectPage);
+        if (StringUtils.isNotEmpty(redirectUrl)) {
+            intent.putExtra(REDIRECT_URL, redirectUrl);
+        }
         return intent;
     }
 }

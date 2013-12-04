@@ -62,7 +62,8 @@ public class MainActivity extends Activity {
     }
 
     private void startAuthentication() {
-        Intent intent = OAuthActivity.createOAuthActivityIntent(this, HelloWorldApplication.CLIENT_ID, HelloWorldApplication.CLIENT_SECRET);
+        Intent intent = OAuthActivity.createOAuthActivityIntent(this, HelloWorldApplication.CLIENT_ID, HelloWorldApplication.CLIENT_SECRET, false,
+            HelloWorldApplication.REDIRECT_URL);
         this.startActivityForResult(intent, AUTH_REQUEST);
     }
 

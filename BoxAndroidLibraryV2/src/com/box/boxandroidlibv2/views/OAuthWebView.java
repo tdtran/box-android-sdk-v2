@@ -82,12 +82,20 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         mWebViewData.setOptionalState(optionalState);
     }
 
-    @SuppressLint("SetJavaScriptEnabled")
     @Override
     public void initializeAuthFlow(final Object activity, final String clientId, final String clientSecret) {
+        initializeAuthFlow(activity, clientId, clientSecret, null);
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    @Override
+    public void initializeAuthFlow(Object activity, String clientId, String clientSecret, String redirectUrl) {
         AndroidBoxResourceHub hub = new AndroidBoxResourceHub();
         BoxAndroidClient boxClient = new BoxAndroidClient(clientId, clientSecret, hub, new BoxJSONParser(hub));
         this.mWebViewData = new OAuthWebViewData(boxClient.getOAuthDataController());
+        if (StringUtils.isNotEmpty(redirectUrl)) {
+            mWebViewData.setRedirectUrl(redirectUrl);
+        }
         mWebClient = createOAuthWebViewClient(mWebViewData, activity, boxClient);
         getSettings().setJavaScriptEnabled(true);
         setWebViewClient(mWebClient);
