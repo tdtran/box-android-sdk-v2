@@ -11,6 +11,7 @@ import org.apache.http.NameValuePair;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.graphics.Bitmap;
@@ -227,6 +228,9 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                 }
                 setStartedCreateOAuth(true);
                 startCreateOAuth(code);
+                if (!allowShowRedirectPage()) {
+                    view.setVisibility(View.INVISIBLE);
+                }
             }
         }
 
@@ -270,6 +274,8 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
             fireEvents(OAuthEvent.PAGE_FINISHED, new StringMessage(StringMessage.MESSAGE_URL, url));
         }
 
+        private static ProgressDialog dialog;
+
         /**
          * Start to create OAuth after getting the code.
          * 
@@ -279,6 +285,8 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
          *            code
          */
         private void startCreateOAuth(final String code) {
+            dialog = ProgressDialog.show(mActivity, mActivity.getText(R.string.boxandroidlibv2_Authenticating),
+                mActivity.getText(R.string.boxandroidlibv2_Please_wait));
             AsyncTask<Null, Null, BoxAndroidOAuthData> task = new AsyncTask<Null, Null, BoxAndroidOAuthData>() {
 
                 @Override
@@ -301,6 +309,9 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
                 @Override
                 protected void onPostExecute(final BoxAndroidOAuthData result) {
+                    if (dialog != null && dialog.isShowing()) {
+                        dialog.dismiss();
+                    }
                     if (result != null) {
                         try {
                             setStartedCreateOAuth(false);
