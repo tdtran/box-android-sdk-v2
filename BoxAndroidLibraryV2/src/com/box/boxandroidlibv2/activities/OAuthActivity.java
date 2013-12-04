@@ -159,11 +159,7 @@ public class OAuthActivity extends Activity {
      * @return
      */
     public static Intent createOAuthActivityIntent(final Context context, final String clientId, final String clientSecret, final boolean allowShowRedirectPage) {
-        Intent intent = new Intent(context, OAuthActivity.class);
-        intent.putExtra(CLIENT_ID, clientId);
-        intent.putExtra(CLIENT_SECRET, clientSecret);
-        intent.putExtra(ALLOW_LOAD_REDIRECT_PAGE, allowShowRedirectPage);
-        return intent;
+        return createOAuthActivityIntent(context, clientId, clientSecret, allowShowRedirectPage, null);
     }
 
     public static Intent createOAuthActivityIntent(final Context context, final String clientId, final String clientSecret,
@@ -172,7 +168,9 @@ public class OAuthActivity extends Activity {
         intent.putExtra(CLIENT_ID, clientId);
         intent.putExtra(CLIENT_SECRET, clientSecret);
         intent.putExtra(ALLOW_LOAD_REDIRECT_PAGE, allowShowRedirectPage);
-        intent.putExtra(REDIRECT_URL, redirectUrl);
+        if (StringUtils.isNotEmpty(redirectUrl)) {
+            intent.putExtra(REDIRECT_URL, redirectUrl);
+        }
         return intent;
     }
 }
