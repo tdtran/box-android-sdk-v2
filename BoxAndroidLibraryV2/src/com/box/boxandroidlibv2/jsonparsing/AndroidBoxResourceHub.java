@@ -9,6 +9,7 @@ import com.box.boxandroidlibv2.dao.BoxAndroidEventCollection;
 import com.box.boxandroidlibv2.dao.BoxAndroidFile;
 import com.box.boxandroidlibv2.dao.BoxAndroidFileVersion;
 import com.box.boxandroidlibv2.dao.BoxAndroidFolder;
+import com.box.boxandroidlibv2.dao.BoxAndroidGroup;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.dao.BoxAndroidUser;
 import com.box.boxandroidlibv2.dao.BoxAndroidWebLink;
@@ -31,6 +32,8 @@ public class AndroidBoxResourceHub extends BoxResourceHub {
                 return BoxAndroidFolder.class;
             case USER:
                 return BoxAndroidUser.class;
+            case GROUP:
+                return BoxAndroidGroup.class;
             case FILE_VERSION:
                 return BoxAndroidFileVersion.class;
             case COMMENT:

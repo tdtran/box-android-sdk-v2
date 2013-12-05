@@ -17,7 +17,7 @@ public class BoxAndroidUser extends BoxUser implements Parcelable {
         super();
     }
 
-    private BoxAndroidUser(Parcel in) {
+    protected BoxAndroidUser(Parcel in) {
         super(new BoxParcel(in));
     }
 
