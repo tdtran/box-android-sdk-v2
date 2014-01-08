@@ -304,8 +304,8 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                         BoxOAuthRequestObject requestObj = BoxOAuthRequestObject.createOAuthRequestObject(code, mwebViewData.getClientId(),
                             mwebViewData.getClientSecret(), mwebViewData.getRedirectUrl());
                         if (StringUtils.isNotEmpty(deviceId) && StringUtils.isNotEmpty(deviceName)) {
-                            requestObj.put("device_id", deviceId);
-                            requestObj.put("device_name", deviceName);
+                            requestObj.put("box_device_id", deviceId);
+                            requestObj.put("box_device_name", deviceName);
                         }
                         oauth = (BoxAndroidOAuthData) mBoxClient.getOAuthManager().createOAuth(requestObj);
                     }
