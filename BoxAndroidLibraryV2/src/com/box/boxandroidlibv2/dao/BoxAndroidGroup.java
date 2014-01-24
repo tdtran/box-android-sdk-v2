@@ -5,17 +5,19 @@ import java.util.Map;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.box.boxjavalibv2.dao.BoxGroup;
+
 /**
  * Data class for group.
  */
-public class BoxAndroidGroup extends BoxAndroidUser implements Parcelable {
+public class BoxAndroidGroup extends BoxGroup implements Parcelable {
 
     public BoxAndroidGroup() {
         super();
     }
 
     private BoxAndroidGroup(Parcel in) {
-        super(in);
+        super(new BoxParcel(in));
     }
 
     /**
