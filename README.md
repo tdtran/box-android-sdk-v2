@@ -161,6 +161,8 @@ The easiest way to authenticate is to use the OAuthActivity, which is included
 in the SDK. Add it to your manifest to use it.
 
 ```java
+// If you don't have a server redirect url, use this instead:
+// Intent intent = createOAuthActivityIntent(context, clientId, clientSecret, false, "http://localhost"); 
 Intent intent = OAuthActivity.createOAuthActivityIntent(this, clientId, 
 	clientSecret);
 startActivityForResult(intent);
