@@ -128,7 +128,8 @@ public class OAuthActivity extends Activity {
     }
 
     /**
-     * Create intent to launch OAuthActivity
+     * Create intent to launch OAuthActivity,use this method only if you already set redirect url in <a href="https://cloud.app.box.com/developers/services">box
+     * dev console</a> and you want to show the redirect page at the end of OAuth flow.
      * 
      * @param context
      *            context
@@ -146,7 +147,8 @@ public class OAuthActivity extends Activity {
     }
 
     /**
-     * Create intent to launch OAuthActivity
+     * Create intent to launch OAuthActivity, use this method only if you already set redirect url in <a
+     * href="https://cloud.app.box.com/developers/services">box dev console</a>.
      * 
      * @param context
      *            context
@@ -162,6 +164,24 @@ public class OAuthActivity extends Activity {
         return createOAuthActivityIntent(context, clientId, clientSecret, allowShowRedirectPage, null);
     }
 
+    /**
+     * Create intent to launch OAuthActivity. Notes about redirect url parameter: If you already set redirect url in <a
+     * href="https://cloud.app.box.com/developers/services">box dev console</a>, you should pass in the same redirect url or use null for redirect url. If you
+     * didn't set it in box dev console, you should pass in a url. In case you don't have a redirect server you can simply use "http://localhost".
+     * 
+     * @param context
+     *            context
+     * @param clientId
+     *            your box client id
+     * @param clientSecret
+     *            your box client secret
+     * @param allowShowRedirectPage
+     *            Whether you want to load/show redirected page after OAuth flow is done.
+     * @param redirectUrl
+     *            redirect url, if you already set redirect url in <a href="https://cloud.app.box.com/developers/services">box dev console</a>, leave this null
+     *            or use the same url, otherwise this field is required. You can use "http://localhost" if you don't have a redirect server.
+     * @return
+     */
     public static Intent createOAuthActivityIntent(final Context context, final String clientId, final String clientSecret,
         final boolean allowShowRedirectPage, String redirectUrl) {
         Intent intent = new Intent(context, OAuthActivity.class);
