@@ -129,7 +129,7 @@ public class OAuthActivity extends Activity {
 
     /**
      * Create intent to launch OAuthActivity,use this method only if you already set redirect url in <a href="https://cloud.app.box.com/developers/services">box
-     * dev console</a>
+     * dev console</a> and you want to show the redirect page at the end of OAuth flow.
      * 
      * @param context
      *            context
@@ -148,7 +148,7 @@ public class OAuthActivity extends Activity {
 
     /**
      * Create intent to launch OAuthActivity, use this method only if you already set redirect url in <a
-     * href="https://cloud.app.box.com/developers/services">box dev console</a> and you want to show the redirect page at the end of OAuth flow.
+     * href="https://cloud.app.box.com/developers/services">box dev console</a>.
      * 
      * @param context
      *            context
