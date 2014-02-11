@@ -19,6 +19,23 @@ import com.box.restclientv2.interfaces.IBoxConfig;
 public class BoxAndroidClient extends BoxClient {
 
     /**
+     * This constructor has some connection parameters. They are used to periodically close idle connections that HttpClient opens.
+     * 
+     * @param maxConnection
+     *            maximum connection.
+     * @param maxConnectionPerRoute
+     *            maximum connection allowed per route.
+     * @param timePeriodCleanUpIdleConnection
+     *            clean up idle connection every such period of time. in miliseconds.
+     * @param idleTimeThreshold
+     *            an idle connection will be closed if idled above this threshold of time. in miliseconds.
+     */
+    public BoxAndroidClient(final String clientId, final String clientSecret, final IBoxResourceHub hub, final IBoxJSONParser parser, final int maxConnection,
+        final int maxConnectionPerRoute, final long timePeriodCleanUpIdleConnection, final long idleTimeThreshold) {
+        super(clientId, clientSecret, hub, parser, maxConnection, maxConnectionPerRoute, timePeriodCleanUpIdleConnection, idleTimeThreshold);
+    }
+
+    /**
      * @param clientId
      *            client id
      * @param clientSecret
