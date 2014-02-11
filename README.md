@@ -3,20 +3,31 @@ Box Android SDK
 
 Building
 --------
-
-### Eclipse
-
 The Android SDK depends on the [Box Java SDK][java-sdk], so you must first
 import it into your workspace and make sure it builds. Import the Android SDK
 second and make the Java SDK a build dependency.
 
+* 1. In your workspace, clone java sdk: git clone git@github.com:box/box-java-sdk-v2.git
+* 2. In your workspace, clone android sdk: git clone git@github.com:box/box-android-sdk-v2.git
+
+### Eclipse
+* 3. In eclipse, import the two projects. File->Import->General->Existing Projects into Workspace, then select these two projects.
+* 4. Copy jar files in java sdk library to your android project.
+   - If you don't have a "libs" folder under your android project root folder, create one.
+   - In "libs" folder(BoxJavaLibraryV2/libs) of java sdk project, copy the non-testing jar files into your android libs folder. They are: commons*.jar, http*.jar, jackson*.jar.
+* 5. Add box android sdk as an android library project: Open properties of your project, select "Android", on bottom "Library" section, click "Add...", add BoxAndroidLibraryV2.
+* 6. Resolve possible conflicts. In case your project already referred to different version of a jar our sdk refers, there would be a conflict. Choose the best version and replace the jar in both projects. We recommend you always use the latest version, or the version that's more stable if you know.
+
 ### Ant
 
-First clone the [Box Java SDK][java-sdk] and follow the instructions in its
-readme on how to build it. Copy the the built BoxJavaLibraryV2.jar to
-BoxAndroidLibraryV2/libs. You can then use Ant to build the project like you
+* 3. Follow the instructions in [Box Java SDK][java-sdk]'s
+readme on how to build it. 
+* 4. Copy the the built BoxJavaLibraryV2.jar to
+BoxAndroidLibraryV2/libs. 
+* 5. You can then use Ant to build the project like you
 would with any other Android library. The simplest way to do this is by running
 `ant debug`.
+* 6. Resolve possible conflict, same as step 6 in eclipse build instruction.
 
 ### Gradle (Experimental)
 
@@ -58,31 +69,94 @@ Here is a more detailed [tutorial][tutorial-box-gradle] on setting up box sdk us
 
 API Calls Quickstart
 --------------------
+Authentication
+--------------
+Make sure you've set up your client id, client secret and (optional) redirect url correctly. Please refer to [developer document]
+(http://developers.box.com/oauth/) for more information.
+You can find a full example of how to perform authentication in the sample app.
 
-### Authenticate
+### Basic Authentication
 
-Authenticate the client with OAuth. See the authentication section below for
-more information.
+The easiest way to authenticate is to use the OAuthActivity, which is included
+in the SDK. Add it to your manifest to use it.
 
 ```java
-boxClient.authenticate(oAuthView, autoRefreshToken, listener);
-```
+// If you don't have a server redirect url, use this instead:
+// Intent intent = createOAuthActivityIntent(context, clientId, clientSecret, false, "http://localhost"); 
+Intent intent = OAuthActivity.createOAuthActivityIntent(this, clientId, 
+	clientSecret);
+startActivityForResult(intent);
 
+@Override
+public void onActivityResult(int requestCode, int resultCode, Intent data) {
+	if (resultCode == Activity.RESULT_CANCELED) {
+		// Get the error message for why authentication failed.
+		String failMessage = data.getStringExtra(OAuthActivity.ERROR_MESSAGE);
+		// Implement your own logic to handle the error.
+	   handleFail(failMessage);
+	} else {
+		// You will get an authenticated oath token object back upon success.
+		BoxAndroidOAuthData oauth = data.getParcelableExtra(OAuthActivity.BOX_CLIENT_OAUTH);
+                // If you don't want to supply a customized hub or parser, use null to fall back to defaults.
+                BoxAndroidClient client = new BoxAndroidClient(clientId, clientSecret, null, null);
+                client.authenticate(oauth);
+		youOwnMethod(client);
+	}
+}
+```
 Our sdk auto refreshes OAuth access token when it expires. You will want to listen to the refresh events and update your stored token after refreshing.
 ```java
 boxClient.addOAuthRefreshListener(OAuthRefreshListener listener) {
     new OAuthRefreshListener() {
         @Override
         public void onRefresh(IAuthData newAuthData) {
+	    BoxOAuthToken oauthObject = boxClient.getAuthData();
             // TODO: save the auth data.
         }						       
     }
 }
 ```
 
+### Advanced Authentication
+
+Alternatively, you can use your own custom login activity with a WebView for
+authentication.
+
+```java
+oauthView = (OAuthWebView) findViewById(R.id.oauthview);
+oauthView.initializeAuthFlow(this, clientId, clientSecret);
+boxClient.authenticate(oauthView, autoRefreshOAuth, getOAuthFlowListener());
+
+// Create a listener listening to OAuth flow. The most important part you need
+// to implement is onAuthFlowEvent and catch the OAUTH_CREATED event. This event
+// indicates that the OAuth flow is done, the BoxClient is authenticated and
+// that you can start making API calls. 
+private OAuthWebViewListener getOAuthFlowListener() {
+	return new OAuthWebViewListener() {
+		@Override
+		public onAuthFlowEvent(final IAuthEvent event,
+			final IAuthFlowMessage message) {
+			// Authentication is done, you can start using your BoxClient
+			// instance.
+		}
+	}
+}
+boxClient.addOAuthRefreshListener(OAuthRefreshListener listener) {
+    new OAuthRefreshListener() {
+        @Override
+        public void onRefresh(IAuthData newAuthData) {
+	    BoxOAuthToken oauthObject = boxClient.getAuthData();
+            // TODO: save the auth data.
+        }						       
+    }
+}
+```
+
+
 After you exit the app and return back, you can use the stored oauth data to authenticate:
 ```java
-boxClient.authenticate(loadStoredAuthData);
+// Re-authenticate using the previously obtained OAuth object.
+boxClient.authenticate(oauthObject);
 ``` 
 
 ### Get Default File Info
@@ -150,73 +224,6 @@ BoxFileRequestObject requestObj =
 boxClient.deleteFile(fileId, requestObj);
 ```
 
-Authentication
---------------
-
-You can find a full example of how to perform authentication in the sample app.
-
-### Basic Authentication
-
-The easiest way to authenticate is to use the OAuthActivity, which is included
-in the SDK. Add it to your manifest to use it.
-
-```java
-// If you don't have a server redirect url, use this instead:
-// Intent intent = createOAuthActivityIntent(context, clientId, clientSecret, false, "http://localhost"); 
-Intent intent = OAuthActivity.createOAuthActivityIntent(this, clientId, 
-	clientSecret);
-startActivityForResult(intent);
-
-@Override
-public void onActivityResult(int requestCode, int resultCode, Intent data) {
-	if (resultCode == Activity.RESULT_CANCELED) {
-		// Get the error message for why authentication failed.
-		String failMessage = data.getStringExtra(OAuthActivity.ERROR_MESSAGE);
-		// Implement your own logic to handle the error.
-	   handleFail(failMessage);
-	} else {
-		// You will get an authenticated oath token object back upon success.
-		BoxAndroidOAuthData oauth = data.getParcelableExtra(OAuthActivity.BOX_CLIENT_OAUTH);
-                BoxAndroidClient client = new BoxAndroidClient(clientId, clientSecret, null, null);
-                client.authenticate(oauth);
-		youOwnMethod(client);
-	}
-}
-```
-
-### Advanced Authentication
-
-Alternatively, you can use your own custom login activity with a WebView for
-authentication.
-
-```java
-oauthView = (OAuthWebView) findViewById(R.id.oauthview);
-oauthView.initializeAuthFlow(this, clientId, clientSecret);
-boxClient.authenticate(oauthView, autoRefreshOAuth, getOAuthFlowListener());
-
-// Create a listener listening to OAuth flow. The most important part you need
-// to implement is onAuthFlowEvent and catch the OAUTH_CREATED event. This event
-// indicates that the OAuth flow is done, the BoxClient is authenticated and
-// that you can start making API calls. 
-private OAuthWebViewListener getOAuthFlowListener() {
-	return new OAuthWebViewListener() {
-		@Override
-		public onAuthFlowEvent(final IAuthEvent event,
-			final IAuthFlowMessage message) {
-
-			// Authentication is done, you can start using your BoxClient
-			// instance.
-		}
-	}
-}
-
-// You can get a BoxOAuthToken and use it to authenticate the client at a later
-// time or in a different activity.
-BoxOAuthToken oauthObject = boxClient.getAuthData();
-
-// Re-authenticate using the previously obtained OAuth object.
-boxClient.authenticate(oauthObject);
-```
 
 [java-sdk]: https://github.com/box/box-java-sdk-private
 [android-gradle]: http://tools.android.com/tech-docs/new-build-system/user-guide#TOC-Multi-project-setup
