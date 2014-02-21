@@ -7,3 +7,6 @@ BoxJavaLibraryV2.jar
 build/
 .gradle
 .DS_Store
+.gradle
+gradle.properties
+gradle/

@@ -1,0 +1,4 @@
+include "BoxAndroidLibraryV2",
+		"BoxSDKSample",
+		"HelloWorld2",
+		"SampleOAuth"

@@ -1,0 +1,49 @@
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath "com.android.tools.build:gradle:0.8.+"
+	}
+}
+
+apply plugin: "android"
+
+repositories {
+	mavenLocal()
+	mavenCentral()
+}
+
+dependencies {
+	compile project(":BoxAndroidLibraryV2")
+}
+
+android {
+	compileSdkVersion 19
+	buildToolsVersion "19.0.1"
+
+	defaultConfig {
+		minSdkVersion 8
+		targetSdkVersion 19
+	}
+
+	sourceSets {
+		main {
+			java.srcDirs = ["src"]
+			manifest.srcFile "AndroidManifest.xml"
+			res.srcDirs = ["res"]
+			resources.srcDirs = ["src"]
+		}
+	}
+
+	lintOptions {
+		abortOnError false
+	}
+
+	packagingOptions {
+		exclude 'META-INF/LICENSE'
+		exclude 'META-INF/LICENSE.txt'
+		exclude 'META-INF/NOTICE'
+		exclude 'META-INF/NOTICE.txt'
+	}
+}
