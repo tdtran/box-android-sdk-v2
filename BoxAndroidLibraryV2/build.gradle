@@ -16,9 +16,6 @@ ext.versionCode = 220
 
 repositories {
 	mavenLocal()
-	maven {
-		url repoDownloadUrl
-	}
 	mavenCentral()
 }
 
@@ -111,8 +108,10 @@ uploadArchives {
 			}
 		}
 
-		repository(url: repoUploadUrl) {
-			authentication(userName: repoUserName, privateKey: repoKeyFile)
+		if (project.hasProperty("repoUploadUrl")) {
+			repository(url: repoUploadUrl) {
+				authentication(userName: repoUserName, privateKey: repoKeyFile)
+			}
 		}
 	}
 }
