@@ -13,10 +13,10 @@ import android.widget.TextView;
 
 import com.box.boxandroidlibv2.viewlisteners.OAuthWebViewListener;
 import com.box.boxandroidlibv2.views.OAuthWebView;
+import com.box.boxjavalibv2.authorization.IAuthEvent;
+import com.box.boxjavalibv2.authorization.IAuthFlowMessage;
 import com.box.boxjavalibv2.authorization.OAuthDataMessage;
 import com.box.boxjavalibv2.events.OAuthEvent;
-import com.box.boxjavalibv2.interfaces.IAuthEvent;
-import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
 
 /**
  * Sample OAuth App, this activity allows user to go through the OAuth flow, retrieve OAuth tokens and display on screen.

@@ -1,6 +1,6 @@
 package com.box.boxandroidlibv2.viewlisteners;
 
-import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
+import com.box.boxjavalibv2.authorization.IAuthFlowMessage;
 
 /**
  * A String message.

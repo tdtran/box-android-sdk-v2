@@ -3,9 +3,9 @@ package com.box.boxandroidlibv2.viewlisteners;
 import android.net.http.SslError;
 import android.webkit.SslErrorHandler;
 
-import com.box.boxjavalibv2.interfaces.IAuthEvent;
-import com.box.boxjavalibv2.interfaces.IAuthFlowListener;
-import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
+import com.box.boxjavalibv2.authorization.IAuthEvent;
+import com.box.boxjavalibv2.authorization.IAuthFlowListener;
+import com.box.boxjavalibv2.authorization.IAuthFlowMessage;
 
 /**
  * Listener listening to the {@link com.box.boxandroidlibv2.views.OAuthWebView}.

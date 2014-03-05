@@ -3,11 +3,11 @@ package com.box.boxandroidlibv2;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.jsonparsing.AndroidBoxResourceHub;
 import com.box.boxjavalibv2.BoxClient;
+import com.box.boxjavalibv2.IBoxConfig;
+import com.box.boxjavalibv2.authorization.IAuthFlowMessage;
 import com.box.boxjavalibv2.dao.BoxOAuthToken;
-import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
-import com.box.boxjavalibv2.interfaces.IBoxJSONParser;
-import com.box.boxjavalibv2.interfaces.IBoxResourceHub;
-import com.box.restclientv2.interfaces.IBoxConfig;
+import com.box.boxjavalibv2.jsonparsing.IBoxJSONParser;
+import com.box.boxjavalibv2.jsonparsing.IBoxResourceHub;
 
 /**
  * This is the main entrance of the sdk. The client contains all resource managers and also handles authentication. Make sure you call authenticate method
