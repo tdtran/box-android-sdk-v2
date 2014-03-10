@@ -27,6 +27,7 @@ import android.webkit.WebViewClient;
 import android.widget.EditText;
 
 import com.box.boxandroidlibv2.BoxAndroidClient;
+import com.box.boxandroidlibv2.BoxAndroidConfigBuilder;
 import com.box.boxandroidlibv2.R;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.exceptions.BoxAndroidLibException;
@@ -91,7 +92,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
     @Override
     public void initializeAuthFlow(Object activity, String clientId, String clientSecret, String redirectUrl) {
         AndroidBoxResourceHub hub = new AndroidBoxResourceHub();
-        BoxAndroidClient boxClient = new BoxAndroidClient(clientId, clientSecret, hub, new BoxJSONParser(hub));
+        BoxAndroidClient boxClient = new BoxAndroidClient(clientId, clientSecret, hub, new BoxJSONParser(hub), (new BoxAndroidConfigBuilder()).build());
         this.mWebViewData = new OAuthWebViewData(boxClient.getOAuthDataController());
         if (StringUtils.isNotEmpty(redirectUrl)) {
             mWebViewData.setRedirectUrl(redirectUrl);

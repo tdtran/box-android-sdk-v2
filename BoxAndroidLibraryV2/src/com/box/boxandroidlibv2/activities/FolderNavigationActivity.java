@@ -28,6 +28,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.box.boxandroidlibv2.BoxAndroidClient;
+import com.box.boxandroidlibv2.BoxAndroidConfigBuilder;
 import com.box.boxandroidlibv2.R;
 import com.box.boxandroidlibv2.adapters.BoxListItemAdapter;
 import com.box.boxandroidlibv2.adapters.BoxListItemAdapter.ViewHolder;
@@ -104,7 +105,7 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
             clientId = getIntent().getStringExtra(EXTRA_BOX_CLIENT_ID);
             clientSecret = getIntent().getStringExtra(EXTRA_BOX_CLIENT_SECRET);
             BoxAndroidOAuthData authData = getIntent().getParcelableExtra(EXTRA_BOX_CLIENT_OAUTH);
-            mClient = new BoxAndroidClient(clientId, clientSecret, null, null);
+            mClient = new BoxAndroidClient(clientId, clientSecret, null, null, (new BoxAndroidConfigBuilder()).build());
             mClient.authenticate(authData);
             mCurrentFolderId = getIntent().getStringExtra(EXTRA_FOLDER_ID);
             mNavNumber = getIntent().getIntExtra(EXTRA_NAV_NUMBER, 0);
@@ -114,7 +115,7 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
             clientId = savedInstanceState.getString(EXTRA_BOX_CLIENT_ID);
             clientSecret = savedInstanceState.getString(EXTRA_BOX_CLIENT_SECRET);
             BoxAndroidOAuthData authData = savedInstanceState.getParcelable(EXTRA_BOX_CLIENT_OAUTH);
-            mClient = new BoxAndroidClient(clientId, clientSecret, null, null);
+            mClient = new BoxAndroidClient(clientId, clientSecret, null, null, (new BoxAndroidConfigBuilder()).build());
             mClient.authenticate(authData);
             mCurrentFolderId = savedInstanceState.getString(EXTRA_FOLDER_ID);
             mNavNumber = savedInstanceState.getInt(EXTRA_NAV_NUMBER, 0);
