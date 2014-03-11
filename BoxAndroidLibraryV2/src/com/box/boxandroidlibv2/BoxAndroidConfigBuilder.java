@@ -1,6 +1,6 @@
 package com.box.boxandroidlibv2;
 
-import com.box.boxjavalibv2.BoxConfig.BoxConfigBuilder;
+import com.box.boxjavalibv2.BoxConfigBuilder;
 
 public class BoxAndroidConfigBuilder extends BoxConfigBuilder {
 

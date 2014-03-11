@@ -3,7 +3,7 @@ package com.box.boxandroidlibv2;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.jsonparsing.AndroidBoxResourceHub;
 import com.box.boxjavalibv2.BoxClient;
-import com.box.boxjavalibv2.BoxConnectionManager;
+import com.box.boxjavalibv2.BoxConnectionManagerBuilder.BoxConnectionManager;
 import com.box.boxjavalibv2.IBoxConfig;
 import com.box.boxjavalibv2.authorization.IAuthFlowMessage;
 import com.box.boxjavalibv2.dao.BoxOAuthToken;

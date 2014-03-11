@@ -42,8 +42,8 @@ import com.box.boxjavalibv2.dao.BoxItem;
 import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
 import com.box.boxjavalibv2.exceptions.BoxServerException;
 import com.box.boxjavalibv2.requests.requestobjects.BoxDefaultRequestObject;
-import com.box.boxjavalibv2.requests.requestobjects.BoxFolderRequestObject;
 import com.box.boxjavalibv2.requests.requestobjects.BoxImageRequestObject;
+import com.box.boxjavalibv2.requests.requestobjects.BoxPagingRequestObject;
 import com.box.restclientv2.exceptions.BoxRestException;
 
 /**
@@ -467,7 +467,7 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
                     intent.setAction(ACTION_FETCHED_FOLDER);
                     intent.putExtra(ARG_FOLDER_ID, folderId);
                     try {
-                        BoxDefaultRequestObject defaultRequest = new BoxDefaultRequestObject();
+                        BoxDefaultRequestObject defaultRequest = new BoxDefaultRequestObject(mClient.getJSONParser());
                         defaultRequest.addQueryParam(EXTRA_NAV_NUMBER, Integer.toString(mNavNumber));
                         defaultRequest.addQueryParam(EXTRA_SOURCE_TYPE, getSourceType());
                         BoxAndroidFolder bf = (BoxAndroidFolder) mClient.getFoldersManager().getFolder(folderId, defaultRequest);
@@ -527,7 +527,7 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
                         itemFields.add(BoxAndroidFile.FIELD_SIZE);
                         itemFields.add(BoxAndroidFile.FIELD_OWNED_BY);
                         BoxAndroidCollection bc = (BoxAndroidCollection) mClient.getFoldersManager().getFolderItems(folderId,
-                            (BoxFolderRequestObject) BoxFolderRequestObject.getFolderItemsRequestObject(limit, offset).addFields(itemFields));
+                            (BoxPagingRequestObject) BoxPagingRequestObject.pagingRequestObject(limit, offset, mClient.getJSONParser()).addFields(itemFields));
                         if (bc != null) {
                             intent.putExtra(ARG_SUCCESS, true);
                             intent.putExtra(Controller.ARG_BOX_COLLECTION, bc);
@@ -588,7 +588,8 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
                             return intent;
                         }
                         // this call the collection is just BoxObjectItems and each does not appear to be an instance of BoxItem.
-                        InputStream input = mClient.getFilesManager().downloadThumbnail(fileId, "png", BoxImageRequestObject.previewRequestObject());
+                        InputStream input = mClient.getFilesManager()
+                            .getThumbnail(fileId, "png", BoxImageRequestObject.previewRequestObject(mClient.getJSONParser())).getContent();
                         FileOutputStream output = new FileOutputStream(downloadLocation);
                         try {
                             IOUtils.copy(input, output);
