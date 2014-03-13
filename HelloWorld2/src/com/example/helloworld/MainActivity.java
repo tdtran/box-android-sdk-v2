@@ -87,7 +87,7 @@ public class MainActivity extends Activity {
         }
         else {
             BoxAndroidOAuthData oauth = data.getParcelableExtra(OAuthActivity.BOX_CLIENT_OAUTH);
-            BoxAndroidClient client = new BoxAndroidClient(HelloWorldApplication.CLIENT_ID, HelloWorldApplication.CLIENT_SECRET, null, null);
+            BoxAndroidClient client = new BoxAndroidClient(HelloWorldApplication.CLIENT_ID, HelloWorldApplication.CLIENT_SECRET, null, null, null);
             client.authenticate(oauth);
             if (client == null) {
                 Toast.makeText(this, "fail", Toast.LENGTH_LONG).show();
@@ -186,8 +186,7 @@ public class MainActivity extends Activity {
                     BoxAndroidClient client = ((HelloWorldApplication) getApplication()).getClient();
                     try {
                         File mockFile = createMockFile();
-                        client.getFilesManager().uploadFile(
-                            BoxFileUploadRequestObject.uploadFileRequestObject(folder.getId(), mockFile.getName(), mockFile, client.getJSONParser()));
+                        client.getFilesManager().uploadFile(BoxFileUploadRequestObject.uploadFileRequestObject(folder.getId(), mockFile.getName(), mockFile));
                     }
                     catch (Exception e) {
                     }
