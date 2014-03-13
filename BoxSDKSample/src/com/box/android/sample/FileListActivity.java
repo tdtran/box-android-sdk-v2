@@ -31,8 +31,8 @@ import com.box.boxjavalibv2.dao.BoxFolder;
 import com.box.boxjavalibv2.dao.BoxTypedObject;
 import com.box.boxjavalibv2.dao.IAuthData;
 import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
-import com.box.boxjavalibv2.requests.requestobjects.BoxFileUploadRequestObject;
 import com.box.restclientv2.exceptions.BoxSDKException;
+import com.box.restclientv2.requestsbase.BoxFileUploadRequestObject;
 
 public class FileListActivity extends ListActivity {
 

@@ -23,7 +23,7 @@ import com.box.boxandroidlibv2.dao.BoxAndroidFile;
 import com.box.boxandroidlibv2.dao.BoxAndroidFolder;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
-import com.box.boxjavalibv2.requests.requestobjects.BoxFileUploadRequestObject;
+import com.box.restclientv2.requestsbase.BoxFileUploadRequestObject;
 
 public class MainActivity extends Activity {
 
