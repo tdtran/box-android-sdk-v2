@@ -3,11 +3,12 @@ package com.box.boxandroidlibv2;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.jsonparsing.AndroidBoxResourceHub;
 import com.box.boxjavalibv2.BoxClient;
+import com.box.boxjavalibv2.BoxConnectionManagerBuilder.BoxConnectionManager;
+import com.box.boxjavalibv2.IBoxConfig;
+import com.box.boxjavalibv2.authorization.IAuthFlowMessage;
 import com.box.boxjavalibv2.dao.BoxOAuthToken;
-import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
-import com.box.boxjavalibv2.interfaces.IBoxJSONParser;
-import com.box.boxjavalibv2.interfaces.IBoxResourceHub;
-import com.box.restclientv2.interfaces.IBoxConfig;
+import com.box.boxjavalibv2.jsonparsing.IBoxJSONParser;
+import com.box.boxjavalibv2.jsonparsing.IBoxResourceHub;
 
 /**
  * This is the main entrance of the sdk. The client contains all resource managers and also handles authentication. Make sure you call authenticate method
@@ -21,18 +22,22 @@ public class BoxAndroidClient extends BoxClient {
     /**
      * This constructor has some connection parameters. They are used to periodically close idle connections that HttpClient opens.
      * 
-     * @param maxConnection
-     *            maximum connection.
-     * @param maxConnectionPerRoute
-     *            maximum connection allowed per route.
-     * @param timePeriodCleanUpIdleConnection
-     *            clean up idle connection every such period of time. in miliseconds.
-     * @param idleTimeThreshold
-     *            an idle connection will be closed if idled above this threshold of time. in miliseconds.
+     * @param clientId
+     *            client id, you can get it from dev console.
+     * @param clientSecret
+     *            client secret, you can get it from dev console.
+     * @param hub
+     *            resource hub. use null if you want to use default one.
+     * @param parser
+     *            json parser, use null if you want to use default one(Jackson).
+     * @param config
+     *            BoxConfig. User BoxAndroidConfigBuilder to build. Normally you only need default config: (new BoxAndroidConfigBuilder()).build()
+     * @param connectionManager
+     *            BoxConnectionManager. Normally you only need default connection manager: (new BoxConnectionManagerBuilder()).build()
      */
-    public BoxAndroidClient(final String clientId, final String clientSecret, final IBoxResourceHub hub, final IBoxJSONParser parser, final int maxConnection,
-        final int maxConnectionPerRoute, final long timePeriodCleanUpIdleConnection, final long idleTimeThreshold) {
-        super(clientId, clientSecret, hub, parser, maxConnection, maxConnectionPerRoute, timePeriodCleanUpIdleConnection, idleTimeThreshold);
+    public BoxAndroidClient(final String clientId, final String clientSecret, final IBoxResourceHub hub, final IBoxJSONParser parser, final IBoxConfig config,
+        final BoxConnectionManager connectionManager) {
+        super(clientId, clientSecret, hub, parser, createMonitoredRestClient(connectionManager), config);
     }
 
     /**
@@ -44,24 +49,22 @@ public class BoxAndroidClient extends BoxClient {
      *            resource hub, use null for default resource hub.
      * @param parser
      *            json parser, use null for default parser.
+     * @param config
+     *            BoxConfig. User BoxAndroidConfigBuilder to build. Normally you only need default config: (new BoxAndroidConfigBuilder()).build()
      */
-    public BoxAndroidClient(final String clientId, final String clientSecret, final IBoxResourceHub resourcehub, final IBoxJSONParser parser) {
-        super(clientId, clientSecret, resourcehub, parser);
+    public BoxAndroidClient(final String clientId, final String clientSecret, final IBoxResourceHub resourcehub, final IBoxJSONParser parser,
+        final IBoxConfig config) {
+        super(clientId, clientSecret, resourcehub, parser, config);
     }
 
     @Deprecated
-    public BoxAndroidClient(String clientId, String clientSecret) {
-        super(clientId, clientSecret);
+    public BoxAndroidClient(String clientId, String clientSecret, final IBoxConfig config) {
+        super(clientId, clientSecret, config);
     }
 
     @Override
     protected IBoxResourceHub createResourceHub() {
         return new AndroidBoxResourceHub();
-    }
-
-    @Override
-    public IBoxConfig getConfig() {
-        return BoxAndroidConfig.getInstance();
     }
 
     @Override

@@ -8,8 +8,8 @@ import android.os.Parcelable;
 
 import com.box.boxjavalibv2.dao.BoxBase;
 import com.box.boxjavalibv2.dao.BoxObject;
-import com.box.boxjavalibv2.interfaces.IBoxParcelWrapper;
-import com.box.boxjavalibv2.interfaces.IBoxParcelable;
+import com.box.boxjavalibv2.dao.IBoxParcelWrapper;
+import com.box.boxjavalibv2.dao.IBoxParcelable;
 
 /**
  * A parcel wrapper wrapping android parcel class.

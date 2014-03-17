@@ -10,13 +10,14 @@ import android.os.Bundle;
 import android.webkit.SslErrorHandler;
 
 import com.box.boxandroidlibv2.BoxAndroidClient;
+import com.box.boxandroidlibv2.BoxAndroidConfigBuilder;
 import com.box.boxandroidlibv2.R;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.viewlisteners.OAuthWebViewListener;
 import com.box.boxandroidlibv2.views.OAuthWebView;
+import com.box.boxjavalibv2.authorization.IAuthEvent;
+import com.box.boxjavalibv2.authorization.IAuthFlowMessage;
 import com.box.boxjavalibv2.events.OAuthEvent;
-import com.box.boxjavalibv2.interfaces.IAuthEvent;
-import com.box.boxjavalibv2.interfaces.IAuthFlowMessage;
 
 /**
  * Activity for OAuth. Use this activity by using the intent from createOAuthActivityIntent method. On completion, this activity will put the parcelable
@@ -68,7 +69,7 @@ public class OAuthActivity extends Activity {
      */
     protected void startOAuth(final String clientId, final String clientSecret, String redirectUrl, boolean allowShowRedirect, String deviceId,
         String deviceName) {
-        BoxAndroidClient boxClient = new BoxAndroidClient(clientId, clientSecret, null, null);
+        BoxAndroidClient boxClient = new BoxAndroidClient(clientId, clientSecret, null, null, (new BoxAndroidConfigBuilder()).build());
         oauthView = (OAuthWebView) findViewById(R.id.oauthview);
         oauthView.setAllowShowingRedirectPage(allowShowRedirect);
         oauthView.initializeAuthFlow(this, clientId, clientSecret, redirectUrl);

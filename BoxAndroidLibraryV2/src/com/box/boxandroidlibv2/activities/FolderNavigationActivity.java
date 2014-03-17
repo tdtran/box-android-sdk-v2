@@ -28,6 +28,7 @@ import android.widget.ListView;
 import android.widget.Toast;
 
 import com.box.boxandroidlibv2.BoxAndroidClient;
+import com.box.boxandroidlibv2.BoxAndroidConfigBuilder;
 import com.box.boxandroidlibv2.R;
 import com.box.boxandroidlibv2.adapters.BoxListItemAdapter;
 import com.box.boxandroidlibv2.adapters.BoxListItemAdapter.ViewHolder;
@@ -40,10 +41,10 @@ import com.box.boxandroidlibv2.viewdata.BoxListItem;
 import com.box.boxjavalibv2.dao.BoxItem;
 import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
 import com.box.boxjavalibv2.exceptions.BoxServerException;
-import com.box.boxjavalibv2.requests.requestobjects.BoxDefaultRequestObject;
-import com.box.boxjavalibv2.requests.requestobjects.BoxFolderRequestObject;
 import com.box.boxjavalibv2.requests.requestobjects.BoxImageRequestObject;
+import com.box.boxjavalibv2.requests.requestobjects.BoxPagingRequestObject;
 import com.box.restclientv2.exceptions.BoxRestException;
+import com.box.restclientv2.requestsbase.BoxDefaultRequestObject;
 
 /**
  * This class is used to navigate a users folder tree.
@@ -104,7 +105,7 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
             clientId = getIntent().getStringExtra(EXTRA_BOX_CLIENT_ID);
             clientSecret = getIntent().getStringExtra(EXTRA_BOX_CLIENT_SECRET);
             BoxAndroidOAuthData authData = getIntent().getParcelableExtra(EXTRA_BOX_CLIENT_OAUTH);
-            mClient = new BoxAndroidClient(clientId, clientSecret, null, null);
+            mClient = new BoxAndroidClient(clientId, clientSecret, null, null, (new BoxAndroidConfigBuilder()).build());
             mClient.authenticate(authData);
             mCurrentFolderId = getIntent().getStringExtra(EXTRA_FOLDER_ID);
             mNavNumber = getIntent().getIntExtra(EXTRA_NAV_NUMBER, 0);
@@ -114,7 +115,7 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
             clientId = savedInstanceState.getString(EXTRA_BOX_CLIENT_ID);
             clientSecret = savedInstanceState.getString(EXTRA_BOX_CLIENT_SECRET);
             BoxAndroidOAuthData authData = savedInstanceState.getParcelable(EXTRA_BOX_CLIENT_OAUTH);
-            mClient = new BoxAndroidClient(clientId, clientSecret, null, null);
+            mClient = new BoxAndroidClient(clientId, clientSecret, null, null, (new BoxAndroidConfigBuilder()).build());
             mClient.authenticate(authData);
             mCurrentFolderId = savedInstanceState.getString(EXTRA_FOLDER_ID);
             mNavNumber = savedInstanceState.getInt(EXTRA_NAV_NUMBER, 0);
@@ -467,8 +468,8 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
                     intent.putExtra(ARG_FOLDER_ID, folderId);
                     try {
                         BoxDefaultRequestObject defaultRequest = new BoxDefaultRequestObject();
-                        defaultRequest.addQueryParam(EXTRA_NAV_NUMBER, Integer.toString(mNavNumber));
-                        defaultRequest.addQueryParam(EXTRA_SOURCE_TYPE, getSourceType());
+                        defaultRequest.getRequestExtras().addQueryParam(EXTRA_NAV_NUMBER, Integer.toString(mNavNumber));
+                        defaultRequest.getRequestExtras().addQueryParam(EXTRA_SOURCE_TYPE, getSourceType());
                         BoxAndroidFolder bf = (BoxAndroidFolder) mClient.getFoldersManager().getFolder(folderId, defaultRequest);
                         if (bf != null) {
                             intent.putExtra(ARG_SUCCESS, true);
@@ -525,8 +526,9 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
                         itemFields.add(BoxAndroidFile.FIELD_NAME);
                         itemFields.add(BoxAndroidFile.FIELD_SIZE);
                         itemFields.add(BoxAndroidFile.FIELD_OWNED_BY);
-                        BoxAndroidCollection bc = (BoxAndroidCollection) mClient.getFoldersManager().getFolderItems(folderId,
-                            (BoxFolderRequestObject) BoxFolderRequestObject.getFolderItemsRequestObject(limit, offset).addFields(itemFields));
+                        BoxPagingRequestObject obj = BoxPagingRequestObject.pagingRequestObject(limit, offset);
+                        obj.getRequestExtras().addFields(itemFields);
+                        BoxAndroidCollection bc = (BoxAndroidCollection) mClient.getFoldersManager().getFolderItems(folderId, obj);
                         if (bc != null) {
                             intent.putExtra(ARG_SUCCESS, true);
                             intent.putExtra(Controller.ARG_BOX_COLLECTION, bc);
@@ -587,7 +589,7 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
                             return intent;
                         }
                         // this call the collection is just BoxObjectItems and each does not appear to be an instance of BoxItem.
-                        InputStream input = mClient.getFilesManager().downloadThumbnail(fileId, "png", BoxImageRequestObject.previewRequestObject());
+                        InputStream input = mClient.getFilesManager().getThumbnail(fileId, "png", BoxImageRequestObject.previewRequestObject()).getContent();
                         FileOutputStream output = new FileOutputStream(downloadLocation);
                         try {
                             IOUtils.copy(input, output);
