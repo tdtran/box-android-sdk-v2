@@ -3,6 +3,10 @@ package com.example.helloworld;
 import android.app.Application;
 
 import com.box.boxandroidlibv2.BoxAndroidClient;
+import com.box.boxandroidlibv2.jsonparsing.AndroidBoxResourceHub;
+import com.box.boxjavalibv2.jsonparsing.BoxJSONParser;
+import com.box.boxjavalibv2.jsonparsing.IBoxJSONParser;
+import com.box.boxjavalibv2.jsonparsing.IBoxResourceHub;
 
 public class HelloWorldApplication extends Application {
 
@@ -23,5 +27,13 @@ public class HelloWorldApplication extends Application {
      */
     public BoxAndroidClient getClient() {
         return mClient;
+    }
+
+    public IBoxJSONParser getJSONParser() {
+        return new BoxJSONParser(getResourceHub());
+    }
+
+    public IBoxResourceHub getResourceHub() {
+        return new AndroidBoxResourceHub();
     }
 }
