@@ -4,6 +4,7 @@ import java.io.File;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.ObjectUtils.Null;
+import org.apache.commons.lang.StringUtils;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -22,10 +23,16 @@ import com.box.boxandroidlibv2.activities.OAuthActivity;
 import com.box.boxandroidlibv2.dao.BoxAndroidFile;
 import com.box.boxandroidlibv2.dao.BoxAndroidFolder;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
+import com.box.boxjavalibv2.authorization.OAuthRefreshListener;
+import com.box.boxjavalibv2.dao.IAuthData;
 import com.box.boxjavalibv2.exceptions.AuthFatalFailureException;
+import com.box.boxjavalibv2.jsonparsing.IBoxJSONParser;
 import com.box.restclientv2.requestsbase.BoxFileUploadRequestObject;
 
 public class MainActivity extends Activity {
+
+    private static final String SHARED_PREF_NAME = MainActivity.class.getName();
+    private static final String AUTH_KEY = "authstring";
 
     private final static int AUTH_REQUEST = 1;
     private final static int UPLOAD_REQUEST = 2;
@@ -55,16 +62,12 @@ public class MainActivity extends Activity {
 
             @Override
             public void onClick(View v) {
-                startAuthentication();
+                // Try load from saved auth first. If no saved auth or loading failed, start over from OAuth UI flow.
+                if (!authenticateFromSavedAuth()) {
+                    startAuthenticationFromUI();
+                }
             }
-
         });
-    }
-
-    private void startAuthentication() {
-        Intent intent = OAuthActivity.createOAuthActivityIntent(this, HelloWorldApplication.CLIENT_ID, HelloWorldApplication.CLIENT_SECRET, false,
-            HelloWorldApplication.REDIRECT_URL);
-        this.startActivityForResult(intent, AUTH_REQUEST);
     }
 
     @Override
@@ -81,24 +84,6 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void onAuthenticated(int resultCode, Intent data) {
-        if (Activity.RESULT_OK != resultCode) {
-            Toast.makeText(this, "fail", Toast.LENGTH_LONG).show();
-        }
-        else {
-            BoxAndroidOAuthData oauth = data.getParcelableExtra(OAuthActivity.BOX_CLIENT_OAUTH);
-            BoxAndroidClient client = new BoxAndroidClient(HelloWorldApplication.CLIENT_ID, HelloWorldApplication.CLIENT_SECRET, null, null, null);
-            client.authenticate(oauth);
-            if (client == null) {
-                Toast.makeText(this, "fail", Toast.LENGTH_LONG).show();
-            }
-            else {
-                ((HelloWorldApplication) getApplication()).setClient(client);
-                Toast.makeText(this, "authenticated", Toast.LENGTH_LONG).show();
-            }
-        }
-    }
-
     private void initDownloadButton() {
         btnDownload = (Button) findViewById(R.id.downloadfile);
         btnDownload.setOnClickListener(new OnClickListener() {
@@ -107,7 +92,6 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 doDownload();
             }
-
         });
     }
 
@@ -119,7 +103,6 @@ public class MainActivity extends Activity {
             public void onClick(View v) {
                 doUpload();
             }
-
         });
     }
 
@@ -232,5 +215,73 @@ public class MainActivity extends Activity {
         catch (Exception e) {
             return null;
         }
+    }
+
+    private boolean authenticateFromSavedAuth() {
+        BoxAndroidOAuthData auth = loadSavedAuth();
+        if (auth != null) {
+            authenticate(auth);
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
+
+    private void startAuthenticationFromUI() {
+        Intent intent = OAuthActivity.createOAuthActivityIntent(this, HelloWorldApplication.CLIENT_ID, HelloWorldApplication.CLIENT_SECRET, false,
+            HelloWorldApplication.REDIRECT_URL);
+        this.startActivityForResult(intent, AUTH_REQUEST);
+    }
+
+    private void onAuthenticated(int resultCode, Intent data) {
+        if (Activity.RESULT_OK != resultCode) {
+            Toast.makeText(this, "fail", Toast.LENGTH_LONG).show();
+        }
+        else {
+            BoxAndroidOAuthData oauth = data.getParcelableExtra(OAuthActivity.BOX_CLIENT_OAUTH);
+            authenticate(oauth);
+        }
+    }
+
+    private void authenticate(BoxAndroidOAuthData auth) {
+        BoxAndroidClient client = new BoxAndroidClient(HelloWorldApplication.CLIENT_ID, HelloWorldApplication.CLIENT_SECRET, null, null, null);
+        client.authenticate(auth);
+        ((HelloWorldApplication) getApplication()).setClient(client);
+        saveAuth(auth);
+        client.addOAuthRefreshListener(new OAuthRefreshListener() {
+
+            @Override
+            public void onRefresh(IAuthData newAuthData) {
+                saveAuth((BoxAndroidOAuthData) newAuthData);
+            }
+
+        });
+        Toast.makeText(this, "authenticated", Toast.LENGTH_LONG).show();
+    }
+
+    private void saveAuth(BoxAndroidOAuthData auth) {
+        try {
+            IBoxJSONParser parser = ((HelloWorldApplication) getApplication()).getJSONParser();
+            String authString = parser.convertBoxObjectToJSONString(auth);
+            getSharedPreferences(SHARED_PREF_NAME, 0).edit().putString(AUTH_KEY, authString).commit();
+        }
+        catch (Exception e) {
+        }
+    }
+
+    private BoxAndroidOAuthData loadSavedAuth() {
+        String authString = getSharedPreferences(SHARED_PREF_NAME, 0).getString(AUTH_KEY, "");
+        if (StringUtils.isNotEmpty(authString)) {
+            try {
+                IBoxJSONParser parser = ((HelloWorldApplication) getApplication()).getJSONParser();
+                BoxAndroidOAuthData auth = parser.parseIntoBoxObject(authString, BoxAndroidOAuthData.class);
+                return auth;
+            }
+            catch (Exception e) {
+                // failed, null will be returned. You can also add more logging, error handling here.
+            }
+        }
+        return null;
     }
 }
