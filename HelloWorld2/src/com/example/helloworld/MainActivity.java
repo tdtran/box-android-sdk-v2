@@ -32,7 +32,7 @@ import com.box.restclientv2.requestsbase.BoxFileUploadRequestObject;
 public class MainActivity extends Activity {
 
     private static final String SHARED_PREF_NAME = MainActivity.class.getName();
-    private static final String AUTH_KEY = "authstring";
+    private static final String AUTH_KEY = "authdatastring";
 
     private final static int AUTH_REQUEST = 1;
     private final static int UPLOAD_REQUEST = 2;
@@ -51,9 +51,9 @@ public class MainActivity extends Activity {
     }
 
     private void initUI() {
-        initAuthButton();
         initUploadButton();
         initDownloadButton();
+        initAuthButton();
     }
 
     private void initAuthButton() {
@@ -68,6 +68,11 @@ public class MainActivity extends Activity {
                 }
             }
         });
+        
+        if (authenticated()) {
+            btnDownload.setVisibility(View.VISIBLE);
+            btnUpload.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -93,6 +98,7 @@ public class MainActivity extends Activity {
                 doDownload();
             }
         });
+        btnDownload.setVisibility(View.GONE);
     }
 
     private void initUploadButton() {
@@ -104,6 +110,7 @@ public class MainActivity extends Activity {
                 doUpload();
             }
         });
+        btnUpload.setVisibility(View.GONE);
     }
 
     private void onFileSelected(int resultCode, Intent data) {
@@ -257,6 +264,8 @@ public class MainActivity extends Activity {
             }
 
         });
+        btnDownload.setVisibility(View.VISIBLE);
+        btnUpload.setVisibility(View.VISIBLE);
         Toast.makeText(this, "authenticated", Toast.LENGTH_LONG).show();
     }
 
@@ -284,4 +293,10 @@ public class MainActivity extends Activity {
         }
         return null;
     }
+    
+    private boolean authenticated() {
+		BoxAndroidClient client = ((HelloWorldApplication) getApplication()).getClient();
+		return client != null && client.isAuthenticated();
+	}
+
 }
