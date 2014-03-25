@@ -83,10 +83,19 @@ public class FileListActivity extends ListActivity {
             }
         });
 
-        startAuth();
+        if (!authenticated()) {
+        	startAuth();
+        } else {
+        	onClientAuthenticated();
+        }
     }
 
-    /**
+    private boolean authenticated() {
+		BoxAndroidClient client = ((BoxSDKSampleApplication) getApplication()).getClient();
+		return client != null && client.isAuthenticated();
+	}
+
+	/**
      * Get the result from OAuth activity, this either returns an error message or a parceled BoxAndroidClient.
      */
     @Override
