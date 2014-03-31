@@ -345,6 +345,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                     ((OAuthWebViewListener) listener).onSslError(handler, error);
                 }
             }
+            handler.cancel();
         }
 
         /**
