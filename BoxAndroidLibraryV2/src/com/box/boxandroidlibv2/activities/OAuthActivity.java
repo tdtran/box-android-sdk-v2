@@ -109,7 +109,7 @@ public class OAuthActivity extends Activity {
 
             @Override
             public void onSslError(final SslErrorHandler handler, final SslError error) {
-                handler.proceed();
+                handler.cancel();
             }
 
             @Override
