@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.http.SslError;
 import android.os.Bundle;
-import android.webkit.SslErrorHandler;
 
 import com.box.boxandroidlibv2.BoxAndroidClient;
 import com.box.boxandroidlibv2.BoxAndroidConfigBuilder;
@@ -81,54 +80,6 @@ public class OAuthActivity extends Activity {
     }
 
     /**
-     * Create a listener to listen to OAuth flow events.
-     * 
-     * @param boxClient
-     * 
-     * @return OAuthWebViewListener
-     */
-    private OAuthWebViewListener getOAuthFlowListener() {
-        return new OAuthWebViewListener() {
-
-            @Override
-            public void onAuthFlowException(final Exception e) {
-                Intent intent = new Intent();
-                intent.putExtra(ERROR_MESSAGE, e.getMessage());
-                OAuthActivity.this.setResult(RESULT_CANCELED, intent);
-                finish();
-            }
-
-            @Override
-            public void onAuthFlowEvent(final IAuthEvent event, final IAuthFlowMessage message) {
-                if (event == OAuthEvent.OAUTH_CREATED) {
-                    Intent intent = new Intent();
-                    intent.putExtra(BOX_CLIENT_OAUTH, (BoxAndroidOAuthData) message.getData());
-                    OAuthActivity.this.setResult(RESULT_OK, intent);
-                    finish();
-                }
-            }
-
-            @Override
-            public void onSslError(final SslErrorHandler handler, final SslError error) {
-                handler.cancel();
-            }
-
-            @Override
-            public void onError(final int errorCode, final String description, final String failingUrl) {
-                Intent intent = new Intent();
-                intent.putExtra(ERROR_MESSAGE, description);
-                OAuthActivity.this.setResult(RESULT_CANCELED, intent);
-                finish();
-            }
-
-            @Override
-            public void onAuthFlowMessage(IAuthFlowMessage message) {
-            }
-
-        };
-    }
-
-    /**
      * Create intent to launch OAuthActivity,use this method only if you already set redirect url in <a href="https://cloud.app.box.com/developers/services">box
      * dev console</a> and you want to show the redirect page at the end of OAuth flow.
      * 
@@ -193,5 +144,56 @@ public class OAuthActivity extends Activity {
             intent.putExtra(REDIRECT_URL, redirectUrl);
         }
         return intent;
+    }
+
+    /**
+     * Create a listener to listen to OAuth flow events.
+     * 
+     * @param boxClient
+     * 
+     * @return OAuthWebViewListener
+     */
+    private OAuthWebViewListener getOAuthFlowListener() {
+        return new OAuthWebViewListener() {
+
+            @Override
+            public void onAuthFlowException(final Exception e) {
+                Intent intent = new Intent();
+                intent.putExtra(ERROR_MESSAGE, e.getMessage());
+                OAuthActivity.this.setResult(RESULT_CANCELED, intent);
+                finish();
+            }
+
+            @Override
+            public void onAuthFlowEvent(final IAuthEvent event, final IAuthFlowMessage message) {
+                if (event == OAuthEvent.OAUTH_CREATED) {
+                    Intent intent = new Intent();
+                    intent.putExtra(BOX_CLIENT_OAUTH, (BoxAndroidOAuthData) message.getData());
+                    OAuthActivity.this.setResult(RESULT_OK, intent);
+                    finish();
+                }
+            }
+
+            @Override
+            public void onSslError(final SslError error) {
+                Intent intent = new Intent();
+                intent.putExtra(ERROR_MESSAGE, "ssl error:" + error.getPrimaryError());
+                OAuthActivity.this.setResult(RESULT_CANCELED, intent);
+                finish();
+            }
+
+            @Override
+            public void onError(final int errorCode, final String description, final String failingUrl) {
+                Intent intent = new Intent();
+                intent.putExtra(ERROR_MESSAGE, description);
+                OAuthActivity.this.setResult(RESULT_CANCELED, intent);
+                finish();
+            }
+
+            @Override
+            public void onAuthFlowMessage(IAuthFlowMessage message) {
+            }
+
+        };
     }
 }

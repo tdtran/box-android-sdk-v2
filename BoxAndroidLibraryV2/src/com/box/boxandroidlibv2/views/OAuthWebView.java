@@ -61,6 +61,8 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
     private String deviceName;
 
+    private final List<OAuthWebViewListener> mListeners = new ArrayList<OAuthWebViewListener>();
+
     /**
      * Constructor.
      * 
@@ -110,7 +112,11 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
     @Override
     public void authenticate(IAuthFlowListener listener) {
-        mWebClient.addListener(listener);
+        addAuthFlowListener(listener);
+
+        for (IAuthFlowListener l : mListeners) {
+            mWebClient.addListener(wrapOAuthWebViewListener(l));
+        }
 
         try {
             loadUrl(mWebViewData.buildUrl().toString());
@@ -122,6 +128,11 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         }
     }
 
+    @Override
+    public void addAuthFlowListener(IAuthFlowListener listener) {
+        mListeners.add(wrapOAuthWebViewListener(listener));
+    }
+
     public void setDevice(final String id, final String name) {
         deviceId = id;
         deviceName = name;
@@ -130,10 +141,15 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         }
     }
 
-    /*
-     * (non-Javadoc)
-     * @see android.webkit.WebView#destroy()
-     */
+    private static OAuthWebViewListener wrapOAuthWebViewListener(IAuthFlowListener listener) {
+        if (listener instanceof OAuthWebViewListener) {
+            return (OAuthWebViewListener) listener;
+        }
+        else {
+            return new WrappedOAuthWebViewListener(listener);
+        }
+    }
+
     @Override
     public void destroy() {
         super.destroy();
@@ -348,11 +364,21 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
         @Override
         public void onReceivedSslError(final WebView view, final SslErrorHandler handler, final SslError error) {
+            handleSslError(view, handler, error);
             for (IAuthFlowListener listener : mListeners) {
                 if (listener != null && listener instanceof OAuthWebViewListener) {
-                    ((OAuthWebViewListener) listener).onSslError(handler, error);
+                    ((OAuthWebViewListener) listener).onSslError(error);
                 }
             }
+        }
+
+        protected void handleReceivedError(final WebView view, final int errorCode, final String description, final String failingUrl) {
+            // By default, doing nothing.
+        }
+
+        protected void handleSslError(final WebView view, final SslErrorHandler handler, final SslError error) {
+            // By default, cancel.
+            handler.cancel();
         }
 
         /**
@@ -416,4 +442,35 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         }
     }
 
+    private static class WrappedOAuthWebViewListener extends OAuthWebViewListener {
+
+        private final IAuthFlowListener mListener;
+
+        WrappedOAuthWebViewListener(IAuthFlowListener listener) {
+            this.mListener = listener;
+        }
+
+        @Override
+        public void onAuthFlowMessage(IAuthFlowMessage message) {
+            mListener.onAuthFlowMessage(message);
+        }
+
+        @Override
+        public void onAuthFlowException(Exception e) {
+            mListener.onAuthFlowException(e);
+        }
+
+        @Override
+        public void onAuthFlowEvent(IAuthEvent event, IAuthFlowMessage message) {
+            mListener.onAuthFlowEvent(event, message);
+        }
+
+        @Override
+        public void onSslError(SslError error) {
+        }
+
+        @Override
+        public void onError(int errorCode, String description, String failingUrl) {
+        }
+    }
 }

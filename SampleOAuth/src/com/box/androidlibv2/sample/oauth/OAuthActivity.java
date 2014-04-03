@@ -7,7 +7,6 @@ import android.net.http.SslError;
 import android.os.Bundle;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.webkit.SslErrorHandler;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -97,15 +96,14 @@ public class OAuthActivity extends Activity {
             }
 
             @Override
-            public void onSslError(final SslErrorHandler handler, final SslError error) {
-                mainText.setText("sslError:" + error.toString());
+            public void onError(final int errorCode, final String description, final String failingUrl) {
+                mainText.setText("error:" + description);
                 mainText.invalidate();
-                handler.proceed();
             }
 
             @Override
-            public void onError(final int errorCode, final String description, final String failingUrl) {
-                mainText.setText("error:" + description);
+            public void onSslError(SslError error) {
+                mainText.setText("sslError:" + error.toString());
                 mainText.invalidate();
             }
 
