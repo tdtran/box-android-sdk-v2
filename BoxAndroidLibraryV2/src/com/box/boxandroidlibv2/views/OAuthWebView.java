@@ -343,12 +343,12 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
                 @Override
                 protected void onPostExecute(final BoxAndroidOAuthData result) {
+                    setOAuthAPICallState(OAuthAPICallState.FINISHED);
                     if (dialog != null && dialog.isShowing()) {
                         dialog.dismiss();
                     }
                     if (result != null) {
                         try {
-                            setOAuthAPICallState(OAuthAPICallState.FINISHED);
                             fireEvents(OAuthEvent.OAUTH_CREATED, new OAuthDataMessage(result, mBoxClient.getJSONParser(), mBoxClient.getResourceHub()));
                         }
                         catch (Exception e) {
