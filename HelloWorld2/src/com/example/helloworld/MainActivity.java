@@ -68,7 +68,7 @@ public class MainActivity extends Activity {
                 }
             }
         });
-        
+
         if (authenticated()) {
             btnDownload.setVisibility(View.VISIBLE);
             btnUpload.setVisibility(View.VISIBLE);
@@ -243,7 +243,7 @@ public class MainActivity extends Activity {
 
     private void onAuthenticated(int resultCode, Intent data) {
         if (Activity.RESULT_OK != resultCode) {
-            Toast.makeText(this, "fail", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, "fail:" + data.getStringExtra(OAuthActivity.ERROR_MESSAGE), Toast.LENGTH_LONG).show();
         }
         else {
             BoxAndroidOAuthData oauth = data.getParcelableExtra(OAuthActivity.BOX_CLIENT_OAUTH);
@@ -293,10 +293,10 @@ public class MainActivity extends Activity {
         }
         return null;
     }
-    
+
     private boolean authenticated() {
-		BoxAndroidClient client = ((HelloWorldApplication) getApplication()).getClient();
-		return client != null && client.isAuthenticated();
-	}
+        BoxAndroidClient client = ((HelloWorldApplication) getApplication()).getClient();
+        return client != null && client.isAuthenticated();
+    }
 
 }

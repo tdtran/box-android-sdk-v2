@@ -149,11 +149,9 @@ public class OAuthActivity extends Activity {
     /**
      * Create a listener to listen to OAuth flow events.
      * 
-     * @param boxClient
-     * 
      * @return OAuthWebViewListener
      */
-    private OAuthWebViewListener getOAuthFlowListener() {
+    protected OAuthWebViewListener getOAuthFlowListener() {
         return new OAuthWebViewListener() {
 
             @Override

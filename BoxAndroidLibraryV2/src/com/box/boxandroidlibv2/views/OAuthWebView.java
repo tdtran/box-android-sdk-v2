@@ -18,6 +18,7 @@ import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.HttpAuthHandler;
@@ -184,16 +185,20 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
      */
     public static class OAuthWebViewClient extends WebViewClient {
 
+        private static enum OAuthAPICallState {
+            PRE, STARTED, FINISHED,
+        };
+
         private BoxClient mBoxClient;
         private final OAuthWebViewData mwebViewData;
         private boolean allowShowRedirectPage = true;
-        private boolean startedCreateOAuth = false;
+        private OAuthAPICallState oauthAPICallState = OAuthAPICallState.PRE;
 
         private String deviceId;
 
         private String deviceName;
 
-        private final List<IAuthFlowListener> mListeners = new ArrayList<IAuthFlowListener>();
+        private final List<OAuthWebViewListener> mListeners = new ArrayList<OAuthWebViewListener>();
         private Activity mActivity;
 
         /**
@@ -218,12 +223,12 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
             deviceName = name;
         }
 
-        public void addListener(final IAuthFlowListener listener) {
+        public void addListener(final OAuthWebViewListener listener) {
             this.mListeners.add(listener);
         }
 
-        void setStartedCreateOAuth(boolean started) {
-            startedCreateOAuth = started;
+        private void setOAuthAPICallState(OAuthAPICallState state) {
+            oauthAPICallState = state;
         }
 
         @Override
@@ -247,17 +252,13 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                         listener.onAuthFlowMessage(new StringMessage(mwebViewData.getResponseType(), code));
                     }
                 }
-                setStartedCreateOAuth(true);
-                startCreateOAuth(code);
-                if (!allowShowRedirectPage()) {
-                    view.setVisibility(View.INVISIBLE);
-                }
+                startCreateOAuth(code, view);
             }
         }
 
         @Override
         public boolean shouldOverrideUrlLoading(WebView view, String url) {
-            if (startedCreateOAuth && !allowShowRedirectPage()) {
+            if ((oauthAPICallState != OAuthAPICallState.PRE) && !allowShowRedirectPage()) {
                 return true;
             }
             return false;
@@ -304,8 +305,14 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
          *            config
          * @param code
          *            code
+         * @param view
          */
-        private void startCreateOAuth(final String code) {
+        private void startCreateOAuth(final String code, WebView view) {
+            if (oauthAPICallState != OAuthAPICallState.PRE) {
+                return;
+            }
+
+            oauthAPICallState = OAuthAPICallState.STARTED;
             try {
                 dialog = ProgressDialog.show(mActivity, mActivity.getText(R.string.boxandroidlibv2_Authenticating),
                     mActivity.getText(R.string.boxandroidlibv2_Please_wait));
@@ -316,6 +323,10 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                 dialog = null;
                 return;
             }
+
+            if (!allowShowRedirectPage()) {
+                view.setVisibility(View.INVISIBLE);
+            }
             AsyncTask<Null, Null, BoxAndroidOAuthData> task = new AsyncTask<Null, Null, BoxAndroidOAuthData>() {
 
                 @Override
@@ -324,8 +335,11 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                     try {
                         oauth = (BoxAndroidOAuthData) mBoxClient.getOAuthManager().createOAuth(code, mwebViewData.getClientId(),
                             mwebViewData.getClientSecret(), mwebViewData.getRedirectUrl(), deviceId, deviceName);
+
+                        Log.d("oauth", "oauth:" + oauth.getAccessToken());
                     }
                     catch (Exception e) {
+                        Log.d("oauth", "oauthfail");
                         oauth = null;
                     }
                     return oauth;
@@ -338,7 +352,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                     }
                     if (result != null) {
                         try {
-                            setStartedCreateOAuth(false);
+                            setOAuthAPICallState(OAuthAPICallState.FINISHED);
                             fireEvents(OAuthEvent.OAUTH_CREATED, new OAuthDataMessage(result, mBoxClient.getJSONParser(), mBoxClient.getResourceHub()));
                         }
                         catch (Exception e) {
@@ -355,9 +369,14 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
         @Override
         public void onReceivedError(final WebView view, final int errorCode, final String description, final String failingUrl) {
-            for (IAuthFlowListener listener : mListeners) {
-                if (listener != null && listener instanceof OAuthWebViewListener) {
-                    ((OAuthWebViewListener) listener).onError(errorCode, description, failingUrl);
+            if (!allowShowRedirectPage() && oauthAPICallState != OAuthAPICallState.PRE) {
+                // Error happens after oauth api call started. This can only be the redirect page. In case user wants to ignore redirect page, we
+                // swallow this error.
+                return;
+            }
+            for (OAuthWebViewListener listener : mListeners) {
+                if (listener != null) {
+                    listener.onError(errorCode, description, failingUrl);
                 }
             }
         }
@@ -365,9 +384,9 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         @Override
         public void onReceivedSslError(final WebView view, final SslErrorHandler handler, final SslError error) {
             handleSslError(view, handler, error);
-            for (IAuthFlowListener listener : mListeners) {
-                if (listener != null && listener instanceof OAuthWebViewListener) {
-                    ((OAuthWebViewListener) listener).onSslError(error);
+            for (OAuthWebViewListener listener : mListeners) {
+                if (listener != null) {
+                    listener.onSslError(error);
                 }
             }
         }
