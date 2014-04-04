@@ -18,7 +18,6 @@ import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.AsyncTask;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.webkit.HttpAuthHandler;
@@ -252,7 +251,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                         listener.onAuthFlowMessage(new StringMessage(mwebViewData.getResponseType(), code));
                     }
                 }
-                startCreateOAuth(code, view);
+                startMakingOAuthAPICall(code, view);
             }
         }
 
@@ -307,7 +306,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
          *            code
          * @param view
          */
-        private void startCreateOAuth(final String code, WebView view) {
+        private void startMakingOAuthAPICall(final String code, WebView view) {
             if (oauthAPICallState != OAuthAPICallState.PRE) {
                 return;
             }
@@ -335,11 +334,8 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                     try {
                         oauth = (BoxAndroidOAuthData) mBoxClient.getOAuthManager().createOAuth(code, mwebViewData.getClientId(),
                             mwebViewData.getClientSecret(), mwebViewData.getRedirectUrl(), deviceId, deviceName);
-
-                        Log.d("oauth", "oauth:" + oauth.getAccessToken());
                     }
                     catch (Exception e) {
-                        Log.d("oauth", "oauthfail");
                         oauth = null;
                     }
                     return oauth;
