@@ -173,11 +173,13 @@ public class OAuthActivity extends Activity {
             }
 
             @Override
-            public void onSslError(final SslError error) {
+            public void onSslError(final SslError error, final boolean canceled) {
                 Intent intent = new Intent();
-                intent.putExtra(ERROR_MESSAGE, "ssl error:" + error.getPrimaryError());
-                OAuthActivity.this.setResult(RESULT_CANCELED, intent);
-                finish();
+                if (canceled) {
+                    intent.putExtra(ERROR_MESSAGE, "ssl error:" + error.getPrimaryError());
+                    OAuthActivity.this.setResult(RESULT_CANCELED, intent);
+                    finish();
+                }
             }
 
             @Override

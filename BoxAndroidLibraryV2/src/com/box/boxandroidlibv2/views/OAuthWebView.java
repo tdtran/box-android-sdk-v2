@@ -14,6 +14,8 @@ import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnDismissListener;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.net.http.SslError;
 import android.os.AsyncTask;
@@ -192,6 +194,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         private final OAuthWebViewData mwebViewData;
         private boolean allowShowRedirectPage = true;
         private OAuthAPICallState oauthAPICallState = OAuthAPICallState.PRE;
+        private boolean sslErrorDialogButtonClicked;
 
         private String deviceId;
 
@@ -379,21 +382,72 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
         @Override
         public void onReceivedSslError(final WebView view, final SslErrorHandler handler, final SslError error) {
-            handleSslError(view, handler, error);
-            for (OAuthWebViewListener listener : mListeners) {
-                if (listener != null) {
-                    listener.onSslError(error);
-                }
+            Resources resources = view.getContext().getResources();
+            StringBuilder sslErrorMessage = new StringBuilder(
+                resources.getString(R.string.boxandroidlibv2_There_are_problems_with_the_security_certificate_for_this_site));
+            sslErrorMessage.append(" ");
+            String sslErrorType;
+            switch (error.getPrimaryError()) {
+                case SslError.SSL_DATE_INVALID:
+                    sslErrorType = view.getResources().getString(R.string.boxandroidlibv2_ssl_error_warning_DATE_INVALID);
+                    break;
+                case SslError.SSL_EXPIRED:
+                    sslErrorType = resources.getString(R.string.boxandroidlibv2_ssl_error_warning_EXPIRED);
+                    break;
+                case SslError.SSL_IDMISMATCH:
+                    sslErrorType = resources.getString(R.string.boxandroidlibv2_ssl_error_warning_ID_MISMATCH);
+                    break;
+                case SslError.SSL_NOTYETVALID:
+                    sslErrorType = resources.getString(R.string.boxandroidlibv2_ssl_error_warning_NOT_YET_VALID);
+                    break;
+                case SslError.SSL_UNTRUSTED:
+                    sslErrorType = resources.getString(R.string.boxandroidlibv2_ssl_error_warning_UNTRUSTED);
+                    break;
+                case SslError.SSL_INVALID:
+                    sslErrorType = resources.getString(R.string.boxandroidlibv2_ssl_error_warning_INVALID);
+                    break;
+                default:
+                    sslErrorType = resources.getString(R.string.boxandroidlibv2_ssl_error_warning_INVALID);
+                    break;
             }
+            sslErrorMessage.append(sslErrorType);
+            sslErrorMessage.append(" ");
+            sslErrorMessage.append(resources.getString(R.string.boxandroidlibv2_ssl_should_not_proceed));
+            // Show the user a dialog to force them to accept or decline the SSL problem before continuing.
+            sslErrorDialogButtonClicked = false;
+            AlertDialog loginAlert = new AlertDialog.Builder(view.getContext()).setTitle(R.string.boxandroidlibv2_Security_Warning)
+                .setMessage(sslErrorMessage.toString()).setIcon(R.drawable.boxandroidlibv2_dialog_warning)
+                .setPositiveButton(R.string.boxandroidlibv2_Continue, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int whichButton) {
+                        sslErrorDialogButtonClicked = true;
+                        handler.proceed();
+                        sendoutSslError(error, false);
+                    }
+                }).setNegativeButton(R.string.boxandroidlibv2_Go_back, new DialogInterface.OnClickListener() {
+
+                    @Override
+                    public void onClick(final DialogInterface dialog, final int whichButton) {
+                        sslErrorDialogButtonClicked = true;
+                        handler.cancel();
+                        sendoutSslError(error, true);
+                    }
+                }).create();
+            loginAlert.setOnDismissListener(new OnDismissListener() {
+
+                @Override
+                public void onDismiss(DialogInterface dialog) {
+                    if (!sslErrorDialogButtonClicked) {
+                        sendoutSslError(error, true);
+                    }
+                }
+            });
+            loginAlert.show();
         }
 
         protected void handleReceivedError(final WebView view, final int errorCode, final String description, final String failingUrl) {
             // By default, doing nothing.
-        }
-
-        protected void handleSslError(final WebView view, final SslErrorHandler handler, final SslError error) {
-            // By default, cancel.
-            handler.cancel();
         }
 
         /**
@@ -403,6 +457,14 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
             mListeners.clear();
             mBoxClient = null;
             mActivity = null;
+        }
+
+        private void sendoutSslError(final SslError error, final boolean canceled) {
+            for (OAuthWebViewListener listener : mListeners) {
+                if (listener != null) {
+                    listener.onSslError(error, canceled);
+                }
+            }
         }
 
         /**
@@ -481,7 +543,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         }
 
         @Override
-        public void onSslError(SslError error) {
+        public void onSslError(SslError error, boolean canceled) {
         }
 
         @Override

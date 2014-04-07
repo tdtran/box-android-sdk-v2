@@ -102,7 +102,7 @@ public class OAuthActivity extends Activity {
             }
 
             @Override
-            public void onSslError(SslError error) {
+            public void onSslError(SslError error, boolean canceled) {
                 mainText.setText("sslError:" + error.toString());
                 mainText.invalidate();
             }

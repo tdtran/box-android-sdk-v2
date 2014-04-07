@@ -25,8 +25,10 @@ public abstract class OAuthWebViewListener implements IAuthFlowListener {
      * 
      * @param error
      *            error details.
+     * @param canceled
+     *            Whether the operation is canceled due to the ssl error.
      */
-    public abstract void onSslError(SslError error);
+    public abstract void onSslError(SslError error, boolean canceled);
 
     /**
      * This indicates the webview receives some error. Implement this method to handle properly.
