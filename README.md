@@ -205,7 +205,8 @@ BoxFile bFile = boxClient.getFilesManager().uploadFile(requestObj);
 
 ```java
 BoxFileUploadRequestObject requestObj = 
-    BoxFileUploadRequestObject.uploadFileRequestObject(parent, "name", file);
+    BoxFileUploadRequestObject.uploadFileRequestObject(parent, "name", file)
+    .setListener(listener);
 BoxAndroidFile bFile = boxClient.getFilesManager().uploadFile(requestObj);
 ```
 
