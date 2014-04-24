@@ -74,6 +74,17 @@ public class BoxAndroidFolder extends BoxFolder implements Parcelable {
         put(FIELD_SHARED_LINK, sharedLink);
     }
 
+    @Override
+    @JsonProperty(FIELD_PERMISSIONS)
+    public BoxAndroidItemPermissions getPermissions() {
+        return (BoxAndroidItemPermissions) getValue(FIELD_PERMISSIONS);
+    }
+
+    @JsonProperty(FIELD_PERMISSIONS)
+    private void setPermissions(BoxAndroidItemPermissions permissions) {
+        put(FIELD_PERMISSIONS, permissions);
+    }
+
     /**
      * Instantiate the object from a map. Each entry in the map reflects to a field.
      * 
