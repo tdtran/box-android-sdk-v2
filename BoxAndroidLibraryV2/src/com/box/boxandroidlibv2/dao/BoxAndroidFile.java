@@ -73,6 +73,17 @@ public class BoxAndroidFile extends BoxFile implements Parcelable {
     }
 
     @Override
+    @JsonProperty(FIELD_PERMISSIONS)
+    public BoxAndroidItemPermissions getPermissions() {
+        return (BoxAndroidItemPermissions) getValue(FIELD_PERMISSIONS);
+    }
+
+    @JsonProperty(FIELD_PERMISSIONS)
+    private void setPermissions(BoxAndroidItemPermissions permissions) {
+        put(FIELD_PERMISSIONS, permissions);
+    }
+
+    @Override
     public int describeContents() {
         return 0;
     }
