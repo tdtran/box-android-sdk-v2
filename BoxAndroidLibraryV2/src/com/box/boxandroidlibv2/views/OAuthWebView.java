@@ -46,6 +46,7 @@ import com.box.boxjavalibv2.authorization.OAuthDataMessage;
 import com.box.boxjavalibv2.authorization.OAuthWebViewData;
 import com.box.boxjavalibv2.events.OAuthEvent;
 import com.box.boxjavalibv2.jsonparsing.BoxJSONParser;
+import com.box.boxjavalibv2.utils.LogUtils;
 import com.box.restclientv2.httpclientsupport.HttpClientURIBuilder;
 
 /**
@@ -339,6 +340,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                             mwebViewData.getClientSecret(), mwebViewData.getRedirectUrl(), deviceId, deviceName);
                     }
                     catch (Exception e) {
+                        LogUtils.printStackTrace(e);
                         oauth = null;
                     }
                     return oauth;
