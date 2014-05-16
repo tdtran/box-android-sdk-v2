@@ -11,6 +11,7 @@ import org.apache.http.NameValuePair;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -190,6 +191,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
             PRE, STARTED, FINISHED,
         };
 
+        private static Dialog dialog;
         private BoxClient mBoxClient;
         private final OAuthWebViewData mwebViewData;
         private boolean allowShowRedirectPage = true;
@@ -298,7 +300,13 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
             fireEvents(OAuthEvent.PAGE_FINISHED, new StringMessage(StringMessage.MESSAGE_URL, url));
         }
 
-        private static ProgressDialog dialog;
+        /**
+         * If you don't need the dialog, just return null.
+         */
+        protected Dialog showDialogWhileWaitingForAuthenticationAPICall() {
+            return ProgressDialog.show(mActivity, mActivity.getText(R.string.boxandroidlibv2_Authenticating),
+                mActivity.getText(R.string.boxandroidlibv2_Please_wait));
+        }
 
         /**
          * Start to create OAuth after getting the code.
@@ -316,8 +324,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
             oauthAPICallState = OAuthAPICallState.STARTED;
             try {
-                dialog = ProgressDialog.show(mActivity, mActivity.getText(R.string.boxandroidlibv2_Authenticating),
-                    mActivity.getText(R.string.boxandroidlibv2_Please_wait));
+                dialog = showDialogWhileWaitingForAuthenticationAPICall();
             }
             catch (Exception e) {
                 // WindowManager$BadTokenException will be caught and the app would not display
