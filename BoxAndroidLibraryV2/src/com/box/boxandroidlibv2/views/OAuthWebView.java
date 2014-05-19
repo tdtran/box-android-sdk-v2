@@ -182,6 +182,10 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         return c;
     }
 
+    protected List<OAuthWebViewListener> OAuthWebViewListeners() {
+        return mListeners;
+    }
+
     /**
      * WebViewClient for the OAuth WebView.
      */
