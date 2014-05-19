@@ -117,7 +117,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
     public void authenticate(IAuthFlowListener listener) {
         addAuthFlowListener(listener);
 
-        for (IAuthFlowListener l : mListeners) {
+        for (IAuthFlowListener l : getOAuthWebViewListeners()) {
             mWebClient.addListener(wrapOAuthWebViewListener(l));
         }
 
@@ -133,7 +133,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
     @Override
     public void addAuthFlowListener(IAuthFlowListener listener) {
-        mListeners.add(wrapOAuthWebViewListener(listener));
+        getOAuthWebViewListeners().add(wrapOAuthWebViewListener(listener));   
     }
 
     public void setDevice(final String id, final String name) {
@@ -180,6 +180,10 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         OAuthWebViewClient c = new OAuthWebViewClient(data, (Activity) activity, boxClient);
         c.setAllowShowRedirectPage(allowShowRedirectPage());
         return c;
+    }
+
+    protected List<OAuthWebViewListener> getOAuthWebViewListeners() {
+        return mListeners;
     }
 
     /**
