@@ -133,7 +133,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
     @Override
     public void addAuthFlowListener(IAuthFlowListener listener) {
-        getOAuthWebViewListeners().add(wrapOAuthWebViewListener(listener));   
+        getOAuthWebViewListeners().add(wrapOAuthWebViewListener(listener));
     }
 
     public void setDevice(final String id, final String name) {
@@ -342,6 +342,8 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
             }
             AsyncTask<Null, Null, BoxAndroidOAuthData> task = new AsyncTask<Null, Null, BoxAndroidOAuthData>() {
 
+                private Exception mCreateOauthException;
+
                 @Override
                 protected BoxAndroidOAuthData doInBackground(final Null... params) {
                     BoxAndroidOAuthData oauth = null;
@@ -351,6 +353,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                     }
                     catch (Exception e) {
                         oauth = null;
+                        mCreateOauthException = e;
                     }
                     return oauth;
                 }
@@ -370,7 +373,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                         }
                     }
                     else {
-                        fireExceptions(new BoxAndroidLibException());
+                        fireExceptions(new BoxAndroidLibException(mCreateOauthException));
                     }
                 }
             };
