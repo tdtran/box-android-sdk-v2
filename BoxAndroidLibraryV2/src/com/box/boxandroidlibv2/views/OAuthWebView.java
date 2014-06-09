@@ -78,6 +78,10 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         super(context, attrs);
     }
 
+    protected OAuthWebViewClient getWebViewClient() {
+        return mWebClient;
+    }
+
     /**
      * Set the state, this is optional.
      * 
@@ -113,6 +117,10 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         setDevice(deviceId, deviceName);
     }
 
+    protected OAuthWebViewData getWebviewData() {
+        return mWebViewData;
+    }
+
     @Override
     public void authenticate(IAuthFlowListener listener) {
         addAuthFlowListener(listener);
@@ -123,8 +131,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
 
         try {
             loadUrl(mWebViewData.buildUrl().toString());
-        }
-        catch (URISyntaxException e) {
+        } catch (URISyntaxException e) {
             if (listener != null) {
                 listener.onAuthFlowException(e);
             }
@@ -147,8 +154,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
     private static OAuthWebViewListener wrapOAuthWebViewListener(IAuthFlowListener listener) {
         if (listener instanceof OAuthWebViewListener) {
             return (OAuthWebViewListener) listener;
-        }
-        else {
+        } else {
             return new WrappedOAuthWebViewListener(listener);
         }
     }
@@ -250,8 +256,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
             String code = null;
             try {
                 code = getResponseValueFromUrl(url);
-            }
-            catch (URISyntaxException e) {
+            } catch (URISyntaxException e) {
                 fireExceptions(e);
             }
             if (StringUtils.isNotEmpty(code)) {
@@ -329,8 +334,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
             oauthAPICallState = OAuthAPICallState.STARTED;
             try {
                 dialog = showDialogWhileWaitingForAuthenticationAPICall();
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 // WindowManager$BadTokenException will be caught and the app would not display
                 // the 'Force Close' message
                 dialog = null;
@@ -350,8 +354,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                     try {
                         oauth = (BoxAndroidOAuthData) mBoxClient.getOAuthManager().createOAuth(code, mwebViewData.getClientId(),
                             mwebViewData.getClientSecret(), mwebViewData.getRedirectUrl(), deviceId, deviceName);
-                    }
-                    catch (Exception e) {
+                    } catch (Exception e) {
                         oauth = null;
                         mCreateOauthException = e;
                     }
@@ -367,12 +370,10 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                     if (result != null) {
                         try {
                             fireEvents(OAuthEvent.OAUTH_CREATED, new OAuthDataMessage(result, mBoxClient.getJSONParser(), mBoxClient.getResourceHub()));
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             fireExceptions(new BoxAndroidLibException(e));
                         }
-                    }
-                    else {
+                    } else {
                         fireExceptions(new BoxAndroidLibException(mCreateOauthException));
                     }
                 }
