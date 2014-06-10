@@ -56,22 +56,21 @@ public class OAuthActivity extends Activity {
         return R.layout.boxandroidlibv2_activity_oauth;
     }
 
-    protected void startOAuth(final String clientId, final String clientSecret, String redirectUrl, boolean allowShowRedirect, String deviceId,
-        String deviceName, boolean autoRefreshOAuth) {
-        BoxAndroidClient boxClient = createBoxClientForOAuth(clientId, clientSecret, redirectUrl);
-        oauthView = createOAuthWebView(allowShowRedirect, deviceId, deviceName);
-        getOAuthWebView().initializeAuthFlow(this, clientId, clientSecret, redirectUrl, boxClient);
-
-        boxClient.authenticate(oauthView, autoRefreshOAuth, getOAuthFlowListener());
-    }
-
-    protected BoxAndroidClient createBoxClientForOAuth(final String clientId, final String clientSecret, String redirectUrl) {
-        return new BoxAndroidClient(clientId, clientSecret, null, null, (new BoxAndroidConfigBuilder()).build());
+    protected boolean shouldAutoRefreshOAuth() {
+        return true;
     }
 
     protected void startOAuth(final String clientId, final String clientSecret, String redirectUrl, boolean allowShowRedirect, String deviceId,
         String deviceName) {
-        startOAuth(clientId, clientSecret, redirectUrl, allowShowRedirect, deviceId, deviceName, true);
+        BoxAndroidClient boxClient = createBoxClientForOAuth(clientId, clientSecret, redirectUrl);
+        oauthView = createOAuthWebView(allowShowRedirect, deviceId, deviceName);
+        getOAuthWebView().initializeAuthFlow(this, clientId, clientSecret, redirectUrl, boxClient);
+
+        boxClient.authenticate(oauthView, shouldAutoRefreshOAuth(), getOAuthFlowListener());
+    }
+
+    protected BoxAndroidClient createBoxClientForOAuth(final String clientId, final String clientSecret, String redirectUrl) {
+        return new BoxAndroidClient(clientId, clientSecret, null, null, (new BoxAndroidConfigBuilder()).build());
     }
 
     protected OAuthWebView createOAuthWebView(boolean allowShowRedirect, String deviceId, String deviceName) {
