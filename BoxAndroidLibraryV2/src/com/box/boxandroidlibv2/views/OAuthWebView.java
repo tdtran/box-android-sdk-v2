@@ -89,7 +89,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
      *            state
      */
     public void setOptionalState(final String optionalState) {
-        mWebViewData.setOptionalState(optionalState);
+        getWebviewData().setOptionalState(optionalState);
     }
 
     @Override
@@ -130,7 +130,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         }
 
         try {
-            loadUrl(mWebViewData.buildUrl().toString());
+            loadUrl(getWebviewData().buildUrl().toString());
         } catch (URISyntaxException e) {
             if (listener != null) {
                 listener.onAuthFlowException(e);
