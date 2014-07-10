@@ -364,9 +364,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                 @Override
                 protected void onPostExecute(final BoxAndroidOAuthData result) {
                     setOAuthAPICallState(OAuthAPICallState.FINISHED);
-                    if (dialog != null && dialog.isShowing()) {
-                        dialog.dismiss();
-                    }
+                    dismissSpinner();
                     if (result != null) {
                         try {
                             fireEvents(OAuthEvent.OAUTH_CREATED, new OAuthDataMessage(result, mBoxClient.getJSONParser(), mBoxClient.getResourceHub()));
@@ -379,6 +377,17 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
                 }
             };
             task.execute();
+        }
+
+        private void dismissSpinner() {
+            if (dialog != null && dialog.isShowing()) {
+                try {
+                    dialog.dismiss();
+                } catch (IllegalArgumentException e) {
+                    // In certain case dialog already disattached from window.
+                }
+                dialog = null;
+            }
         }
 
         @Override
