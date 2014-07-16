@@ -9,6 +9,7 @@ import com.box.boxjavalibv2.authorization.IAuthFlowMessage;
 import com.box.boxjavalibv2.dao.BoxOAuthToken;
 import com.box.boxjavalibv2.jsonparsing.IBoxJSONParser;
 import com.box.boxjavalibv2.jsonparsing.IBoxResourceHub;
+import com.box.restclientv2.IBoxRESTClient;
 
 /**
  * This is the main entrance of the sdk. The client contains all resource managers and also handles authentication. Make sure you call authenticate method
@@ -55,6 +56,11 @@ public class BoxAndroidClient extends BoxClient {
     public BoxAndroidClient(final String clientId, final String clientSecret, final IBoxResourceHub resourcehub, final IBoxJSONParser parser,
         final IBoxConfig config) {
         super(clientId, clientSecret, resourcehub, parser, config);
+    }
+
+    public BoxAndroidClient(final String clientId, final String clientSecret, final IBoxResourceHub hub, final IBoxJSONParser parser,
+        final IBoxRESTClient restClient, final IBoxConfig config) {
+        super(clientId, clientSecret, hub, parser, restClient, config);
     }
 
     @Deprecated
