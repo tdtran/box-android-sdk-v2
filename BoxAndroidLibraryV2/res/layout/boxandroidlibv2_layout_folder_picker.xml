@@ -5,7 +5,8 @@
     android:layout_height="fill_parent"
     android:background="#ffffff"
     android:gravity="center"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+    android:filterTouchesWhenObscured="true">
 
     <include layout="@layout/boxandroidlibv2_custom_title" />
 

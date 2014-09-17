@@ -5,7 +5,8 @@
     android:layout_height="fill_parent"
     android:background="@drawable/boxandroidlibv2_box_background_header"
     android:gravity="center"
-    android:orientation="vertical" >
+    android:orientation="vertical" 
+    android:filterTouchesWhenObscured="true">
 
     <ListView
         android:id="@+id/PickerListView"
