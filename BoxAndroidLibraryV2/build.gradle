@@ -11,8 +11,8 @@ apply plugin: "android-library"
 apply plugin: "maven"
 
 archivesBaseName = "box-android-sdk"
-ext.version = "3.0.4-SNAPSHOT"
-ext.versionCode = 304
+ext.version = "3.0.6-SNAPSHOT"
+ext.versionCode = 306
 
 repositories {
 	mavenLocal()
@@ -28,7 +28,7 @@ configurations {
 dependencies {
 	archives "org.apache.maven.wagon:wagon-ssh:2.2"
 	compile "com.android.support:support-v4:20.+"
-	compile "net.box:boxjavalibv2:3.1.0"
+	compile "net.box:boxjavalibv2:3.1.1"
 	compile "com.fasterxml.jackson.core:jackson-annotations:2.2.2"
 	compile "com.fasterxml.jackson.core:jackson-core:2.2.2"
 	compile "com.fasterxml.jackson.core:jackson-databind:2.2.2"

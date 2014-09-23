@@ -76,8 +76,7 @@ public class BoxParcel implements IBoxParcelWrapper {
     public void writeParcelable(IBoxParcelable val, int flags) {
         if (val != null) {
             val.writeToParcel(this, flags);
-        }
-        else {
+        } else {
             this.writeBooleanArray(new boolean[] {false});
         }
     }
@@ -89,6 +88,8 @@ public class BoxParcel implements IBoxParcelWrapper {
             Object value = entry.getValue();
             if (!(value instanceof BoxObject) || value instanceof Parcelable) {
                 // Makes sure non parcelable BoxObject not getting into parcel
+                newMap.put(entry.getKey(), value);
+            } else if (value instanceof Parcelable[]) {
                 newMap.put(entry.getKey(), value);
             }
         }
