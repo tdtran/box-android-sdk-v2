@@ -23,7 +23,9 @@
           <root url="jar://$MODULE_DIR$/libs/BoxJavaLibraryV2.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../box-java-sdk-v2/BoxJavaLibraryV2/src" />
+        </SOURCES>
       </library>
     </orderEntry>
     <orderEntry type="module-library">
