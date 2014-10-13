@@ -39,7 +39,8 @@ public class FileListActivity extends ListActivity {
     private final static String TAG = "com.box.android.sample.FileListActivity";
 
     private FileListAdapter adapter;
-    private String currentFolderId = "0";
+    private static final String ROOT_FOLDER_ID = "0";
+    private String currentFolderId = ROOT_FOLDER_ID;
 
     private final static int AUTHENTICATE_REQUEST = 0;
     private final static int PICK_FOLDER_REQUEST = 1;
@@ -157,7 +158,7 @@ public class FileListActivity extends ListActivity {
      * Override the back button so that we go to the parent folder.
      */
     public void onBackPressed() {
-        if (currentFolderId == "0") {
+        if (currentFolderId.equals(ROOT_FOLDER_ID)){
             super.onBackPressed();
         }
         Thread t = new Thread() {
@@ -168,7 +169,7 @@ public class FileListActivity extends ListActivity {
                 try {
                     BoxFolder parentFolder = getClient().getFoldersManager().getFolder(currentFolderId, null).getParent();
                     if (parentFolder == null) {
-                        parentFolderId = "0";
+                        parentFolderId = ROOT_FOLDER_ID;
                     }
                     else {
                         parentFolderId = parentFolder.getId();
