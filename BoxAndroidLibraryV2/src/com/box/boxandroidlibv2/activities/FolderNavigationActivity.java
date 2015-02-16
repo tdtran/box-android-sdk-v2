@@ -174,8 +174,7 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
     protected ThumbnailManager initializeThumbnailManager() {
         try {
             return new ThumbnailManager(getCacheDir());
-        }
-        catch (FileNotFoundException e) {
+        } catch (FileNotFoundException e) {
             finish();
             return null;
 
@@ -217,8 +216,7 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
         outState.putString(EXTRA_BOX_CLIENT_SECRET, clientSecret);
         try {
             outState.putParcelable(EXTRA_BOX_CLIENT_OAUTH, (BoxAndroidOAuthData) mClient.getAuthData());
-        }
-        catch (AuthFatalFailureException e) {
+        } catch (AuthFatalFailureException e) {
             // This shouldn't happen at all.
         }
         outState.putInt(EXTRA_NAV_NUMBER, mNavNumber);
@@ -264,17 +262,13 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
 
         if (mCurrentFolderId.equals(intent.getStringExtra(Controller.ARG_FOLDER_ID))) {
 
-            BoxAndroidFolder boxFolder = intent.getParcelableExtra(Controller.ARG_BOX_FOLDER);
-            final BoxAndroidCollection collection = boxFolder.getItemCollection();
-
             BoxListItemAdapter adapter = ((BoxListItemAdapter) mListView.getAdapter());
             adapter.remove(intent.getAction());
-            if (collection.getTotalCount() > 0) {
-                // because the default folder items don't have all the fields we need do folder item fetch if there are any additional items.
-                ((BoxListItemAdapter) mListView.getAdapter()).add(new BoxListItem(mController.fetchFolderItems(mCurrentFolderId, 0, collection.getEntries()
-                    .size()), Controller.ACTION_FETCHED_FOLDER_ITEMS));
 
-            }
+            // because the default folder items don't have all the fields we need do folder item fetch.
+            ((BoxListItemAdapter) mListView.getAdapter()).add(new BoxListItem(mController.fetchFolderItems(mCurrentFolderId, 0, 1000),
+                Controller.ACTION_FETCHED_FOLDER_ITEMS));
+
         }
     }
 
@@ -301,11 +295,9 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
             int limit = intent.getIntExtra(Controller.ARG_LIMIT, -1);
             adapter.remove(intent.getAction());
             adapter.add(collection);
-            if (offset + collection.getEntries().size() < collection.getTotalCount()) {
+            if (offset + limit < collection.getTotalCount()) {
                 // if not all entries were fetched add a task to fetch more items if user scrolls to last entry.
-                ((BoxListItemAdapter) mListView.getAdapter()).add(new BoxListItem(mController.fetchFolderItems(mCurrentFolderId, offset
-                                                                                                                                 + collection.getEntries()
-                                                                                                                                     .size(), limit),
+                ((BoxListItemAdapter) mListView.getAdapter()).add(new BoxListItem(mController.fetchFolderItems(mCurrentFolderId, offset + limit, 1000),
                     Controller.ACTION_FETCHED_FOLDER_ITEMS));
             }
 
@@ -375,11 +367,9 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
         public void onReceive(Context context, Intent intent) {
             if (intent.getAction().equals(Controller.ACTION_FETCHED_FOLDER)) {
                 onFetchedFolder(intent);
-            }
-            else if (intent.getAction().equals(Controller.ACTION_FETCHED_FOLDER_ITEMS)) {
+            } else if (intent.getAction().equals(Controller.ACTION_FETCHED_FOLDER_ITEMS)) {
                 onFetchedFolderItems(intent);
-            }
-            else if (intent.getAction().equals(Controller.ACTION_DOWNLOADED_FILE_THUMBNAIL)) {
+            } else if (intent.getAction().equals(Controller.ACTION_DOWNLOADED_FILE_THUMBNAIL)) {
                 onDownloadedThumbnail(intent);
             }
         }
@@ -406,15 +396,13 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
                     getApiExecutor().execute(listItem.getTask());
                 }
                 return;
-            }
-            else if (listItem.getType() == BoxListItem.TYPE_BOX_FILE_ITEM || (listItem.getType() == BoxListItem.TYPE_BOX_FOLDER_ITEM)) {
+            } else if (listItem.getType() == BoxListItem.TYPE_BOX_FILE_ITEM || (listItem.getType() == BoxListItem.TYPE_BOX_FOLDER_ITEM)) {
 
                 if (listItem.getBoxItem() instanceof BoxAndroidFile) {
                     if (listItem.getTask() == null) {
                         listItem.setTask(mController.downloadThumbnail(listItem.getBoxItem().getId(),
                             mThumbnailManager.getThumbnailForFile(listItem.getBoxItem().getId()), holder));
-                    }
-                    else if (listItem.getTask().isDone()) {
+                    } else if (listItem.getTask().isDone()) {
                         try {
                             Intent intent = (Intent) listItem.getTask().get();
                             // if we were unable to get this thumbnail before try it again.
@@ -422,8 +410,7 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
                                 listItem.setTask(mController.downloadThumbnail(listItem.getBoxItem().getId(),
                                     mThumbnailManager.getThumbnailForFile(listItem.getBoxItem().getId()), holder));
                             }
-                        }
-                        catch (Exception e) {
+                        } catch (Exception e) {
                             // e.printStackTrace();
                         }
                     }
@@ -476,22 +463,18 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
                             intent.putExtra(Controller.ARG_BOX_FOLDER, bf);
                         }
 
-                    }
-                    catch (AuthFatalFailureException e) {
+                    } catch (AuthFatalFailureException e) {
                         e.printStackTrace();
                         handleAuthenticationError();
-                    }
-                    catch (BoxRestException e) {
+                    } catch (BoxRestException e) {
                         e.printStackTrace();
 
                         intent.putExtra(ARG_SUCCESS, false);
-                    }
-                    catch (BoxServerException e) {
+                    } catch (BoxServerException e) {
                         e.printStackTrace();
 
                         intent.putExtra(ARG_SUCCESS, false);
-                    }
-                    finally {
+                    } finally {
                         getLocalBroadcastManager().sendBroadcast(intent);
                     }
 
@@ -535,22 +518,18 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
 
                         }
 
-                    }
-                    catch (AuthFatalFailureException e) {
+                    } catch (AuthFatalFailureException e) {
                         e.printStackTrace();
                         handleAuthenticationError();
-                    }
-                    catch (BoxRestException e) {
+                    } catch (BoxRestException e) {
                         e.printStackTrace();
 
                         intent.putExtra(ARG_SUCCESS, false);
-                    }
-                    catch (BoxServerException e) {
+                    } catch (BoxServerException e) {
                         e.printStackTrace();
 
                         intent.putExtra(ARG_SUCCESS, false);
-                    }
-                    finally {
+                    } finally {
                         getLocalBroadcastManager().sendBroadcast(intent);
                     }
 
@@ -593,25 +572,20 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
                         FileOutputStream output = new FileOutputStream(downloadLocation);
                         try {
                             IOUtils.copy(input, output);
-                        }
-                        finally {
+                        } finally {
                             IOUtils.closeQuietly(input);
                             IOUtils.closeQuietly(output);
                         }
                         if (downloadLocation.exists()) {
                             intent.putExtra(ARG_SUCCESS, true);
                         }
-                    }
-                    catch (AuthFatalFailureException e) {
+                    } catch (AuthFatalFailureException e) {
                         handleAuthenticationError();
-                    }
-                    catch (BoxRestException e) {
+                    } catch (BoxRestException e) {
                         intent.putExtra(ARG_SUCCESS, false);
-                    }
-                    catch (BoxServerException e) {
+                    } catch (BoxServerException e) {
                         intent.putExtra(ARG_SUCCESS, false);
-                    }
-                    finally {
+                    } finally {
                         getLocalBroadcastManager().sendBroadcast(intent);
                     }
 
@@ -631,12 +605,10 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
             if (item instanceof BoxAndroidFolder) {
                 handleFolderClick((BoxAndroidFolder) item);
                 return;
-            }
-            else if (item instanceof BoxAndroidFile) {
+            } else if (item instanceof BoxAndroidFile) {
                 handleFileClick((BoxAndroidFile) item);
                 return;
-            }
-            else {
+            } else {
                 handleOtherClick(item);
                 return;
             }
@@ -654,8 +626,7 @@ public class FolderNavigationActivity extends Activity implements OnItemClickLis
             Intent intent = getLaunchIntent(this, folder.getId(), (BoxAndroidOAuthData) mClient.getAuthData(), clientId, clientSecret);
             intent.setClass(this, getClass());
             startActivity(intent);
-        }
-        catch (AuthFatalFailureException e) {
+        } catch (AuthFatalFailureException e) {
             // This sohuld not happen.
         }
 

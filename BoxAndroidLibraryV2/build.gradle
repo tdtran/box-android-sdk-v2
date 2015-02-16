@@ -3,7 +3,7 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath "com.android.tools.build:gradle:0.12.+"
+    	classpath 'com.android.tools.build:gradle:1.+'
 	}
 }
 
@@ -11,8 +11,8 @@ apply plugin: "android-library"
 apply plugin: "maven"
 
 archivesBaseName = "box-android-sdk"
-ext.version = "3.0.4-SNAPSHOT"
-ext.versionCode = 304
+ext.version = "3.0.7"
+ext.versionCode = 307
 
 repositories {
 	mavenLocal()
@@ -28,7 +28,7 @@ configurations {
 dependencies {
 	archives "org.apache.maven.wagon:wagon-ssh:2.2"
 	compile "com.android.support:support-v4:20.+"
-	compile "com.box:box-java-sdk:3.0.9-SNAPSHOT"
+	compile "net.box:boxjavalibv2:3.1.8"
 	compile "com.fasterxml.jackson.core:jackson-annotations:2.2.2"
 	compile "com.fasterxml.jackson.core:jackson-core:2.2.2"
 	compile "com.fasterxml.jackson.core:jackson-databind:2.2.2"
@@ -61,10 +61,12 @@ android {
 	}
 
 	libraryVariants.all { variant ->
-		def suffix = "${variant.mergedFlavor.versionName}"
-		def originalFile = variant.outputFile
-		def name = originalFile.name.replace(archivesBaseName, "${archivesBaseName}-${suffix}")
-		variant.outputFile = new File(originalFile.parent, name)
+        variant.outputs.each { output ->
+            def suffix = "${variant.mergedFlavor.versionName}"
+            def originalFile = output.outputFile
+            def name = originalFile.name.replace(archivesBaseName, "${archivesBaseName}-${suffix}")
+            output.outputFile = new File(originalFile.parent, name)
+        }
 	}
 }
 

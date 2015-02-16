@@ -11,6 +11,7 @@ import com.box.boxandroidlibv2.dao.BoxAndroidFileVersion;
 import com.box.boxandroidlibv2.dao.BoxAndroidFolder;
 import com.box.boxandroidlibv2.dao.BoxAndroidGroup;
 import com.box.boxandroidlibv2.dao.BoxAndroidGroupMembership;
+import com.box.boxandroidlibv2.dao.BoxAndroidItemCollection;
 import com.box.boxandroidlibv2.dao.BoxAndroidItemPermissions;
 import com.box.boxandroidlibv2.dao.BoxAndroidOAuthData;
 import com.box.boxandroidlibv2.dao.BoxAndroidUser;
@@ -54,6 +55,8 @@ public class AndroidBoxResourceHub extends BoxResourceHub {
                 return BoxAndroidEvent.class;
             case ITEM_PERMISSIONS:
                 return BoxAndroidItemPermissions.class;
+            case COLLECTION:
+                return BoxAndroidItemCollection.class;
             case ITEMS:
             case FILES:
             case USERS:
@@ -64,6 +67,7 @@ public class AndroidBoxResourceHub extends BoxResourceHub {
             case EMAIL_ALIASES:
             case WEB_LINKS:
             case GROUP_MEMBERSHIPS:
+            case COLLECTIONS:
                 return BoxAndroidCollection.class;
             case EVENTS:
                 return BoxAndroidEventCollection.class;

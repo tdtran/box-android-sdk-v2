@@ -6,6 +6,7 @@
     <com.box.boxandroidlibv2.views.OAuthWebView
         android:id="@+id/oauthview"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:filterTouchesWhenObscured="true">
     </com.box.boxandroidlibv2.views.OAuthWebView>
 </LinearLayout>

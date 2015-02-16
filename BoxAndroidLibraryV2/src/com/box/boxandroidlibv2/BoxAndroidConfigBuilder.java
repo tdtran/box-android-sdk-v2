@@ -5,7 +5,7 @@ import com.box.boxjavalibv2.BoxConfigBuilder;
 public class BoxAndroidConfigBuilder extends BoxConfigBuilder {
 
     /** sdk version number */
-    private final static String VERSION_NUMBER = "v3.0.3";
+    private final static String VERSION_NUMBER = "v3.0.7";
 
     private final static String COMBINED_VERSION = "java_%s,android_%s";
 
