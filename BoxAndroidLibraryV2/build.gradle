@@ -4,7 +4,7 @@ buildscript {
 		jcenter()
 	}
 	dependencies {
-    	classpath 'com.android.tools.build:gradle:1.4.+'
+    	classpath 'com.android.tools.build:gradle:1.5.+'
 	}
 }
 
@@ -57,6 +57,11 @@ android {
 		targetSdkVersion 21
 		versionName project.ext.version
 		versionCode project.ext.versionCode
+	}
+
+	packagingOptions {
+		exclude 'META-INF/NOTICE.txt'
+		exclude 'META-INF/LICENSE.txt'
 	}
 
 	sourceSets {
