@@ -49,8 +49,9 @@ dependencies {
 }
 
 android {
-	compileSdkVersion 21
+	compileSdkVersion 23
 	buildToolsVersion "23.0.2"
+	useLibrary 'org.apache.http.legacy'
 
 	defaultConfig {
 		minSdkVersion 10
