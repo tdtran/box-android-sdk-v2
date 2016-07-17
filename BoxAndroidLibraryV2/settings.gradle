@@ -1,5 +1,2 @@
-include ':appcompat'
-project(':appcompat').projectDir = new File('../../appcompat')
-
 include ':ttxutils'
 project(':ttxutils').projectDir = new File('../../ttxutils')
