@@ -49,8 +49,8 @@ dependencies {
 }
 
 android {
-	compileSdkVersion 25
-	buildToolsVersion '25.0.1'
+	compileSdkVersion extVersions.compileSdk
+	buildToolsVersion extVersions.buildTools
 	useLibrary 'org.apache.http.legacy'
 
 	defaultConfig {
