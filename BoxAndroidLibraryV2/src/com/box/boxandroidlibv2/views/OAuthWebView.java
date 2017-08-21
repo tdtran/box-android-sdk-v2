@@ -79,7 +79,7 @@ public class OAuthWebView extends WebView implements IAuthFlowUI {
         super(context, attrs);
     }
 
-    protected OAuthWebViewClient getWebViewClient() {
+    public OAuthWebViewClient getWebViewClient() {
         return mWebClient;
     }
 
